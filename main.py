@@ -1,4 +1,7 @@
 #Ce fichier est l'endroit où le programme commence.
-import tkinter #Ce module permet de faire une interface graphique (une application avec des fenêtres et pas seulement du texte dans la console)
-fenetre = tkinter.Tk() #Crée une fenêtre
-fenetre.mainloop()
+from tkinter import *
+import fenetreprincipale
+
+
+fenetre = fenetreprincipale.FenetrePrincipale(master=Tk()) #Crée une fenêtre
+fenetre.mainloop() #La fenêtre principale entre la boucle des événements, c.-à-d. qu'elle commence à recevoir les entrées de l'utilisateur
