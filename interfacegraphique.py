@@ -1,10 +1,7 @@
-# coding: utf8
 # Attention les noms de variables ne contiennent pas d'accent, ce qui peut changer leur signification (par ex : côté devient cote)
 from case import *
 import turtle
 
-# Constantes
-largeurCase = 10 #Largeur d'une case en pixels
 nbreDeCaseCote = 10 #Nombre de _cases par côté de la grille
 
 
