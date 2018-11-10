@@ -40,7 +40,7 @@ class Case:
     """
     TAILLE = 10 # taille en pixels, le nom est en majuscules par convention, car c'est une constante
 
-    def __init__(self, position, etat=Etat.vide):
+    def __init__(self, position, etat=Etat.vide, bateau=None):
         """
         constructeur de la classe "Case"
 
@@ -52,10 +52,8 @@ class Case:
         """
         self.position = list(position)
         self.etat = etat
-        self._bateau = None
+        self._bateau = bateau
 
-
-    import bateau
 
 
     def setBateau(self, bateau):
