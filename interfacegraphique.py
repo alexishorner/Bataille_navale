@@ -1,17 +1,17 @@
 # coding: utf8
-#Attention les noms de variables ne contiennent pas d'accent, ce qui peut changer leur signification (par ex : côté devient cote)
-from Case import *
+# Attention les noms de variables ne contiennent pas d'accent, ce qui peut changer leur signification (par ex : côté devient cote)
+from case import *
 import turtle
 
-#Constantes
+# Constantes
 largeurCase = 10 #Largeur d'une case en pixels
-nbreDeCaseCote = 10 #Nombre de cases par côté de la grille
+nbreDeCaseCote = 10 #Nombre de _cases par côté de la grille
 
 
-#Variables globales (c.à.d. accédées partout dans le programme, y compris à l'intérieur de fonctions)
+# Variables globales (c.à.d. accédées partout dans le programme, y compris à l'intérieur de fonctions)
 stylo = turtle.Turtle() #Objet utilisé pour dessiner à l'écran
 
-#Fonctions pour l'affichage
+# Fonctions pour l'affichage
 def dessinerCase(case):
     """"
     Dessine une case aux coordonnées coord (les coordonnées vont de 0 à nbreDeCasesCote**2-1,
