@@ -21,7 +21,7 @@ class AbstractBateau:
         """
         self._cases = list(cases)
 
-    def setCases(self, cases):
+    def set_cases(self, cases):
         """
         Méthode permettant de modifier la valeur de "_cases".
 
@@ -29,23 +29,23 @@ class AbstractBateau:
         et que
         :return: booléen informant sur le succès de l'opération
         """
-        if len(cases) == self.__class__.TAILLE and sontAlignees(cases):  # le "self.__class__.TAILLE" permet d'accéder à la taille du bateau,
+        if len(cases) == self.__class__.TAILLE and sont_alignees(cases):  # le "self.__class__.TAILLE" permet d'accéder à la taille du bateau,
                                                                          # y compris avec les classes héritant de "AbstractBateau".
             for case in cases:
                 if case._bateau is not None:  # vérifie qu'un autre bateau n'est pas déjà présent sur une des nouvelles cases
                     return False  # renvoie "False" car un bateau est déjà présent
 
             for case in self._cases:
-                case.setBateau(None)  # enlève le bateau des anciennes cases
+                case.set_bateau(None)  # enlève le bateau des anciennes cases
 
             self._cases = cases
             for case in self._cases:
-                case.setBateau(self)  # ajoute le bateau aux nouvelles cases
+                case.set_bateau(self)  # ajoute le bateau aux nouvelles cases
             return True  # renvoie "True", car les cases ont bien été remplacées
         else:
             return False  # renvoie "False", car l'opération a échoué
 
-    def estCoule(self):
+    def est_coule(self):
         """
         Méthode définissant si un bateau est coulé.
 
@@ -56,16 +56,16 @@ class AbstractBateau:
                 return False
         return True
 
-    def recevoirTir(self, case):
+    def recevoir_tir(self, case):
         """
         Méthode appelée lorsque le joueur tire sur une case appartenant au bateau.
 
         :return: booléen informant si le tir a été effectué avec succès ou non
         """
         if case in self._cases:  # si la case est une case du bateau
-            if not self.estCoule():  # si le bateau n'est pas coulé
+            if not self.est_coule():  # si le bateau n'est pas coulé
                 case.etat = Etat.touche  # le bateau est touché en cette case
-                if self.estCoule():
+                if self.est_coule():
                     for chaqueCase in self._cases:
                         chaqueCase.etat = Etat.coule  # si le bateau est coulé, on change l'état de chaque case
             return True

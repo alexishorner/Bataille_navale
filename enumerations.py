@@ -1,11 +1,6 @@
 from enum import IntEnum, unique
 
 
-@unique
-class Mode(IntEnum):
-    tortue = 0
-    console = 1
-
 @unique  # Assure que chaque valeur de l'énumération est unique
 class Etat(IntEnum):
     """

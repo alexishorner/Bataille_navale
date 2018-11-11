@@ -1,7 +1,7 @@
 from case import *
 
 
-def sontAlignees(cases):
+def sont_alignees(cases):
     """
     Fonction déterminant si plusieurs cases sont alignées entre elles.
     :param cases: liste d'objets de type "Case" dont on veut tester l'alignement
