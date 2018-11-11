@@ -13,7 +13,7 @@ class Case:
 
         ATTENTION : comme suggéré par le caractère "_" dans le nom de l'attribut _bateau,
         il ne faut pas modifier cet attribut directement, mais faire appel à la méthode "setBateau(self, bateau)"
-        :param position: position cartésienne du coin supérieur gauche de la case sur la grille
+        :param position: position cartésienne du coin inférieur gauche de la case sur la grille
         :param etat: État de la case, lire la docstring de la classe "Etat" pour plus d'informations.
         :param bateau: Bateau présent sur cette case. Si la case est vide, ce paramètre vaut "None"
         """
@@ -29,6 +29,15 @@ class Case:
         y = self.position[Coord.y]
         cote = self.__class__.TAILLE
         return ([x, y], [x+cote, y], [x+cote, y+cote], [x, y+cote])
+
+    def milieu(self):
+        """
+        :return: position du milieu de la case
+        """
+        x = self.position[Coord.x]
+        y = self.position[Coord.y]
+        demiLong = self.TAILLE/2.0
+        return x + demiLong, y + demiLong
 
     def setBateau(self, bateau):
         """

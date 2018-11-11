@@ -17,7 +17,7 @@ def sontAlignees(cases):
 
         premCase = cases[0]  # première case
         for i in range(1, len(cases)-1):  # on ne teste pas la première et la dernière, car cela a déjà été fait avant
-            if cases[i].position[coord] != premCase.position[coord]:  # si la case n'est pas alignée avec la première case
+            if cases[i].position[coord] != premCase.position[coord]:  # si la case n'est pas alignée avec la première case TODO: Attention comparaison entre deux nombres flottants avec l'opérateur !=
                 return False
         return True
     return False

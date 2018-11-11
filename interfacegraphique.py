@@ -22,7 +22,7 @@ class Stylo:
             valAttendues = str(list(modes.keys()).extend([0, 1]))
             e.args = ("Paramètre \"mode\" invalide." + "Valeur reçue : " + str(mode) + "Les valeurs attendues sont : " + valAttendues,)
             raise e
-        self._mode = mode
+        self.MODE = mode
         if mode == Mode.tortue:
             self.tortue = turtle.Turtle()
             self.tortue.hideturtle()  # cache la tortue
@@ -46,7 +46,7 @@ class Stylo:
         :param ferme: booléen indiquant si le style doit fermer la forme en reliant le premier et dernier point.
         :return: "None"
         """
-        if self._mode == Mode.tortue:
+        if self.MODE == Mode.tortue:
             self.tortue.up()
             self.tortue.goto(chemin[0])
             self.tortue.down()
@@ -54,6 +54,22 @@ class Stylo:
                 self.tortue.goto(chemin[i])
             if ferme:
                 self.tortue.goto(chemin[0])
+        #TODO: if self.MODE == Mode.console:
 
     def dessinerEtat(self, case):
+        if case.etat == Etat.dansLEau:
+            self.dessinerDansLEau(case.milieu())
+        elif case.etat == Etat.touche:
+            self.dessinerTouche(case.milieu())
+        elif case.etat == Etat.coule:
+            self.dessinerCoule(case.milieu())
+
+    def dessinerDansLEau(self, position):
+
+
+    def dessinerTouche(self, position):
+
+
+    def dessinerCoule(self, position):
+
 
