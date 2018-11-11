@@ -21,6 +21,14 @@ class Case:
         self.etat = etat
         self._bateau = bateau
 
+    def carre(self):
+        """
+        :return: carré occupé par la case
+        """
+        x = self.position[Coord.x]
+        y = self.position[Coord.y]
+        cote = self.__class__.TAILLE
+        return ([x, y], [x+cote, y], [x+cote, y+cote], [x, y+cote])
 
     def setBateau(self, bateau):
         """

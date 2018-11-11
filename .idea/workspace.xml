@@ -2,12 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3e8ebae2-7fd0-41f4-a585-879b66bdee5b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/enumerations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Case.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bateau.py" beforeDir="false" afterPath="$PROJECT_DIR$/bateau.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/case.py" beforeDir="false" afterPath="$PROJECT_DIR$/case.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fonctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/fonctions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/enumerations.py" beforeDir="false" afterPath="$PROJECT_DIR$/enumerations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interfacegraphique.py" beforeDir="false" afterPath="$PROJECT_DIR$/interfacegraphique.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -31,7 +29,7 @@
         <counts>
           <entry key="dic" value="3" />
           <entry key="ipynb" value="1" />
-          <entry key="py" value="11" />
+          <entry key="py" value="12" />
           <entry key="xml" value="1" />
         </counts>
       </usages-collector>
@@ -39,20 +37,20 @@
         <counts>
           <entry key="Dictionary" value="3" />
           <entry key="IPNB" value="1" />
-          <entry key="Python" value="11" />
+          <entry key="Python" value="12" />
           <entry key="XML" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="98" />
-          <entry key="Python" value="19042" />
+          <entry key="Python" value="20849" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="82" />
-          <entry key="py" value="19042" />
+          <entry key="py" value="20849" />
           <entry key="txt" value="16" />
         </counts>
       </usages-collector>
@@ -73,11 +71,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/interfacegraphique.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="26" column="30" selection-start-line="26" selection-start-column="30" selection-end-line="26" selection-end-column="30" />
+            <state relative-caret-position="756">
+              <caret line="55" column="43" selection-start-line="52" selection-start-column="12" selection-end-line="55" selection-end-column="43" />
               <folding>
                 <element signature="e#131#157#0" expanded="true" />
-                <marker date="1541941327281" expanded="true" signature="424:620" ph="..." />
+                <marker date="1541950329997" expanded="true" signature="1250:1468" ph="..." />
               </folding>
             </state>
           </provider>
@@ -99,8 +97,12 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/case.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="26" lean-forward="true" selection-start-column="26" selection-end-column="26" />
+            <state relative-caret-position="408">
+              <caret line="30" column="67" selection-start-line="30" selection-start-column="67" selection-end-line="30" selection-end-column="67" />
+              <folding>
+                <marker date="1541946767533" expanded="true" signature="1007:1254" ph="..." />
+                <marker date="1541946767533" expanded="true" signature="1282:1291" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -108,8 +110,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/enumerations.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+            <state relative-caret-position="102">
+              <caret line="6" column="15" selection-start-line="6" selection-start-column="15" selection-end-line="6" selection-end-column="15" />
+              <folding>
+                <marker date="1541946767538" expanded="true" signature="63:96" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -137,6 +142,10 @@
       <find>False</find>
       <find>#</find>
       <find>AbstractBateau.__init__</find>
+      <find>speed</find>
+      <find>speed(</find>
+      <find>def speed</find>
+      <find>_mode</find>
     </findStrings>
     <replaceStrings>
       <replace>self</replace>
@@ -161,8 +170,8 @@
         <option value="$PROJECT_DIR$/bataille_navale.ipynb" />
         <option value="$PROJECT_DIR$/fonctions.py" />
         <option value="$PROJECT_DIR$/bateau.py" />
-        <option value="$PROJECT_DIR$/enumerations.py" />
         <option value="$PROJECT_DIR$/case.py" />
+        <option value="$PROJECT_DIR$/enumerations.py" />
         <option value="$PROJECT_DIR$/interfacegraphique.py" />
       </list>
     </option>
@@ -216,7 +225,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24983476" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24983476" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32991204" />
@@ -298,25 +307,39 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/case.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="26" lean-forward="true" selection-start-column="26" selection-end-column="26" />
+        <state relative-caret-position="408">
+          <caret line="30" column="67" selection-start-line="30" selection-start-column="67" selection-end-line="30" selection-end-column="67" />
+          <folding>
+            <marker date="1541946767533" expanded="true" signature="1007:1254" ph="..." />
+            <marker date="1541946767533" expanded="true" signature="1282:1291" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/enumerations.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+        <state relative-caret-position="102">
+          <caret line="6" column="15" selection-start-line="6" selection-start-column="15" selection-end-line="6" selection-end-column="15" />
+          <folding>
+            <marker date="1541946767538" expanded="true" signature="63:96" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/turtle.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-207">
+          <caret line="2137" column="13" selection-start-line="2137" selection-start-column="4" selection-end-line="2137" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/interfacegraphique.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="26" column="30" selection-start-line="26" selection-start-column="30" selection-end-line="26" selection-end-column="30" />
+        <state relative-caret-position="756">
+          <caret line="55" column="43" selection-start-line="52" selection-start-column="12" selection-end-line="55" selection-end-column="43" />
           <folding>
             <element signature="e#131#157#0" expanded="true" />
-            <marker date="1541941327281" expanded="true" signature="424:620" ph="..." />
+            <marker date="1541950329997" expanded="true" signature="1250:1468" ph="..." />
           </folding>
         </state>
       </provider>
