@@ -23,9 +23,10 @@ class Stylo(turtle.Turtle):
         :param case: case à dessiner
         :return: "None"
         """
-        point0 = case.position
-        point1 = case.position
-        chemin = [case.position, [case.position[Coord.x]+case.TAILLE, case.position[Coord.y]+case.TAILLE], case.position]
+        x = case.position[Coord.x]
+        y = case.position[Coord.y]
+        cote = case.TAILLE
+        chemin = [[x, y], [x+cote, y], [x+cote, y+cote], [x, y+cote]]
         self.dessiner()
 
     def dessiner(self, chemin, ferme=True):
