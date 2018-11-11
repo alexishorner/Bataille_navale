@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3e8ebae2-7fd0-41f4-a585-879b66bdee5b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/bateau.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/enumerations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Case.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/abstractbateau.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bateau.py" beforeDir="false" afterPath="$PROJECT_DIR$/bateau.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/case.py" beforeDir="false" afterPath="$PROJECT_DIR$/case.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fonctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/fonctions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interfacegraphique.py" beforeDir="false" afterPath="$PROJECT_DIR$/interfacegraphique.py" afterDir="false" />
@@ -30,27 +30,29 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="dic" value="3" />
-          <entry key="py" value="8" />
+          <entry key="ipynb" value="1" />
+          <entry key="py" value="11" />
           <entry key="xml" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="Dictionary" value="3" />
-          <entry key="Python" value="8" />
+          <entry key="IPNB" value="1" />
+          <entry key="Python" value="11" />
           <entry key="XML" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="98" />
-          <entry key="Python" value="14664" />
+          <entry key="Python" value="19042" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="82" />
-          <entry key="py" value="14664" />
+          <entry key="py" value="19042" />
           <entry key="txt" value="16" />
         </counts>
       </usages-collector>
@@ -62,23 +64,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fonctions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="17" column="38" selection-start-line="17" selection-start-column="38" selection-end-line="17" selection-end-column="38" />
-              <folding>
-                <marker date="1541868154698" expanded="true" signature="868:873" ph="..." />
-              </folding>
+            <state relative-caret-position="34">
+              <caret line="2" selection-start-line="2" selection-end-line="2" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/interfacegraphique.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" selection-start-line="3" selection-end-line="3" />
+            <state relative-caret-position="289">
+              <caret line="26" column="30" selection-start-line="26" selection-start-column="30" selection-end-line="26" selection-end-column="30" />
               <folding>
-                <element signature="e#145#163#0" expanded="true" />
-                <marker date="1541871198366" expanded="true" signature="680:738" ph="..." />
+                <element signature="e#131#157#0" expanded="true" />
+                <marker date="1541941327281" expanded="true" signature="424:620" ph="..." />
               </folding>
             </state>
           </provider>
@@ -87,27 +86,30 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bateau.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2006">
-              <caret line="118" column="28" lean-forward="true" selection-start-line="118" selection-start-column="28" selection-end-line="118" selection-end-column="28" />
+            <state relative-caret-position="2159">
+              <caret line="127" column="88" selection-start-line="127" selection-start-column="88" selection-end-line="127" selection-end-column="88" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <marker date="1541871908480" expanded="true" signature="64:69" ph="..." />
-                <marker date="1541871908480" expanded="true" signature="852:1817" ph="..." />
-                <marker date="1541871908480" expanded="true" signature="2874:2968" ph="..." />
+                <marker date="1541939841653" expanded="true" signature="66:71" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/case.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="260">
-              <caret line="57" column="17" selection-start-line="57" selection-start-column="17" selection-end-line="57" selection-end-column="17" />
-              <folding>
-                <marker date="1541871908487" expanded="true" signature="1001:1006" ph="..." />
-                <marker date="1541871908487" expanded="true" signature="2406:2443" ph="..." />
-              </folding>
+            <state>
+              <caret column="26" lean-forward="true" selection-start-column="26" selection-end-column="26" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/enumerations.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
             </state>
           </provider>
         </entry>
@@ -117,6 +119,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Jupyter Notebook" />
         <option value="Python Script" />
       </list>
     </option>
@@ -125,7 +128,21 @@
     <findStrings>
       <find>_bateau</find>
       <find>cases</find>
+      <find>stylo</find>
+      <find>len</find>
+      <find>taille</find>
+      <find>self.TAILLE</find>
+      <find>self.type</find>
+      <find>_cases</find>
+      <find>False</find>
+      <find>#</find>
+      <find>AbstractBateau.__init__</find>
     </findStrings>
+    <replaceStrings>
+      <replace>self</replace>
+      <replace>#</replace>
+      <replace>super().__init__</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -138,11 +155,15 @@
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/Case.py" />
         <option value="$PROJECT_DIR$/interfaceGraphique.py" />
-        <option value="$PROJECT_DIR$/fonctions.py" />
         <option value="$PROJECT_DIR$/abstractbateau.py" />
-        <option value="$PROJECT_DIR$/interfacegraphique.py" />
+        <option value="$USER_HOME$/Desktop/test.py" />
+        <option value="$USER_HOME$/Desktop/test2.py" />
+        <option value="$PROJECT_DIR$/bataille_navale.ipynb" />
+        <option value="$PROJECT_DIR$/fonctions.py" />
         <option value="$PROJECT_DIR$/bateau.py" />
+        <option value="$PROJECT_DIR$/enumerations.py" />
         <option value="$PROJECT_DIR$/case.py" />
+        <option value="$PROJECT_DIR$/interfacegraphique.py" />
       </list>
     </option>
   </component>
@@ -230,47 +251,72 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fonctions.py">
+    <entry file="file://$USER_HOME$/Desktop/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="17" column="38" selection-start-line="17" selection-start-column="38" selection-end-line="17" selection-end-column="38" />
+        <state relative-caret-position="34">
+          <caret line="2" column="10" selection-start-line="2" selection-start-column="10" selection-end-line="2" selection-end-column="10" />
           <folding>
-            <marker date="1541868154698" expanded="true" signature="868:873" ph="..." />
+            <marker date="1541872104355" expanded="true" signature="11:16" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/interfacegraphique.py">
+    <entry file="file://$USER_HOME$/Desktop/test2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        <state>
+          <caret column="14" lean-forward="true" selection-start-column="14" selection-end-column="14" />
           <folding>
-            <element signature="e#145#163#0" expanded="true" />
-            <marker date="1541871198366" expanded="true" signature="680:738" ph="..." />
+            <marker date="1541872261495" expanded="true" signature="14:28" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bataille_navale.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fonctions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/bateau.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2006">
-          <caret line="118" column="28" lean-forward="true" selection-start-line="118" selection-start-column="28" selection-end-line="118" selection-end-column="28" />
+        <state relative-caret-position="2159">
+          <caret line="127" column="88" selection-start-line="127" selection-start-column="88" selection-end-line="127" selection-end-column="88" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <marker date="1541871908480" expanded="true" signature="64:69" ph="..." />
-            <marker date="1541871908480" expanded="true" signature="852:1817" ph="..." />
-            <marker date="1541871908480" expanded="true" signature="2874:2968" ph="..." />
+            <marker date="1541939841653" expanded="true" signature="66:71" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/case.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="57" column="17" selection-start-line="57" selection-start-column="17" selection-end-line="57" selection-end-column="17" />
+        <state>
+          <caret column="26" lean-forward="true" selection-start-column="26" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/enumerations.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/interfacegraphique.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="26" column="30" selection-start-line="26" selection-start-column="30" selection-end-line="26" selection-end-column="30" />
           <folding>
-            <marker date="1541871908487" expanded="true" signature="1001:1006" ph="..." />
-            <marker date="1541871908487" expanded="true" signature="2406:2443" ph="..." />
+            <element signature="e#131#157#0" expanded="true" />
+            <marker date="1541941327281" expanded="true" signature="424:620" ph="..." />
           </folding>
         </state>
       </provider>
