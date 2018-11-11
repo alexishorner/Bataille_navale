@@ -72,8 +72,12 @@ class Grille:
 
     C'est un tableau en deux dimensions de cases
     """
+    TAILLE_MAX = 26  # Si la taille excède 26, les coordonnées nécessitent plusieurs lettres
     def __init__(self, taille = 10):
-        self.TAILLE = taille
+        if taille < 26:
+            self.TAILLE = taille
+        else:
+            self.TAILLE = self.__class__.TAILLE_MAX
         self.cases = []
         for i in range(self.TAILLE):
             ligne = []
@@ -83,12 +87,36 @@ class Grille:
             self.cases.append(ligne)
 
     def coord_bataile_vers_grille(self, coordonnees):
-        copieCoordonnees = coordonnees
-        x = None
-        y = None
-        if type(copieCoordonnees == str):
-            copieCoordonnees.replace(" ", "")
-            copieCoordonnees = copieCoordonnees.lower()
-            x = ""
-            while copieCoordonnees[0].sdigit():
-                x += copieCoordonnees[0]    string.ascii_letters(copieCoordonnees).index()
+        """
+        Convertit les coordonnées de la bataille navale (ex : "A5" ou ("A", 5)) en coordonnées de la grille (ex: (1, 5)).
+
+        :param coordonnees: coordonnées de la bataille navale
+        :return: coordonnées équivalentes sur la grille
+        """
+        copieCoordonnees = "".join(coordonnees)  # On assure que "copieCoordonnes" est une chaîne de caractères et non une liste ou un tuple
+        copieCoordonnees = copieCoordonnees.replace(" ", "")  # On enlève les espaces.
+        copieCoordonnees = copieCoordonnees.replace(".", "")  # On enlève les points
+        copieCoordonnees = copieCoordonnees.lower()  # On met tout en minuscules.
+
+        x = ""
+        lettres = ""
+        while copieCoordonnees[0].isalpha():
+            lettres += copieCoordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copieCoordonnees".
+            copieCoordonnees = copieCoordonnees[1:len(copieCoordonnees)]
+        for c in lettres:
+            x += str(string.ascii_letters(c).index())  # On transforme les lettres en nombres
+        x = int(x)
+
+        y = int(copieCoordonnees)
+
+        return x, y
+
+    def coord_grille_vers_bataille(self, coordonnees):
+        """
+        Convertit les coordonnées de la grille vers celles de la bataille navale.
+        :param coordonnees: tuple ou liste représentant les coordonnées sur la grille
+        :return: chaîne de caractères des coordonnées équivalentes dans la bataille navale (ex : "B8")
+        """
+        lettre = string.ascii_uppercase[coordonnees[Coord.x]]  # On convertit la coordonnée x en lettre majuscule
+        nombre = coordonnees[Coord.y]
+        return lettre + str(nombre)
