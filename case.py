@@ -104,7 +104,7 @@ class Grille:
             lettres += copieCoordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copieCoordonnees".
             copieCoordonnees = copieCoordonnees[1:len(copieCoordonnees)]
         for c in lettres:
-            x += str(string.ascii_letters(c).index())  # On transforme les lettres en nombres
+            x += str(string.ascii_letters(c).index())  # On transforme les lettres en nombres TODO: ATTENTION, index commence à 0
         x = int(x)
 
         y = int(copieCoordonnees)
