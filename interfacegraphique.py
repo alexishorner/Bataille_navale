@@ -53,11 +53,11 @@ class Tortue(turtle.Turtle):
         :param case: case dont il faut dessiner l'état
         :return: "None"
         """
-        if case.etat == Etat.dansLEau:
+        if case.etat == Etat.DANS_L_EAU:
             self._dessiner_dans_l_eau(case.milieu())
-        elif case.etat == Etat.touche:
+        elif case.etat == Etat.TOUCHE:
             self._dessiner_touche(case.milieu())
-        elif case.etat == Etat.coule:
+        elif case.etat == Etat.COULE:
             self._dessiner_coule(case.milieu())
 
     def _dessiner_dans_l_eau(self, position):

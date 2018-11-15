@@ -1,13 +1,14 @@
 from enumerations import *
 import string
 
+
 class Case:
     """
     Classe permettant de créer des objets de type case, composants élémentaires de la grille de jeu.
     """
     TAILLE = 10  # taille en pixels, le nom est en majuscules par convention, car c'est une constante
 
-    def __init__(self, position, etat=Etat.vide, bateau=None):
+    def __init__(self, position, etat=Etat.VIDE, bateau=None):
         """
         constructeur de la classe "Case"
 
@@ -28,7 +29,7 @@ class Case:
         x = self.position[Coord.x]
         y = self.position[Coord.y]
         cote = self.__class__.TAILLE
-        return ([x, y], [x+cote, y], [x+cote, y+cote], [x, y+cote])
+        return [x, y], [x+cote, y], [x+cote, y+cote], [x, y+cote]
 
     def milieu(self):
         """
@@ -36,8 +37,8 @@ class Case:
         """
         x = self.position[Coord.x]
         y = self.position[Coord.y]
-        demiLong = self.TAILLE/2.0
-        return x + demiLong, y + demiLong
+        demi_longueur = self.TAILLE/2.0
+        return x + demi_longueur, y + demi_longueur
 
     def set_bateau(self, bateau):
         """
@@ -47,11 +48,11 @@ class Case:
         :return: pas de sortie spécifiée
         """
         if bateau is not None:
-            if self.etat == Etat.vide:
-                self.etat = Etat.bateauInv
+            if self.etat == Etat.VIDE:
+                self.etat = Etat.BATEAU_INTACT
         else:
-            if self.etat == Etat.bateauInv:
-                self.etat = Etat.vide
+            if self.etat == Etat.BATEAU_INTACT:
+                self.etat = Etat.VIDE
         self._bateau = bateau
 
     def recevoir_tir(self):
@@ -73,7 +74,8 @@ class Grille:
     C'est un tableau en deux dimensions de cases
     """
     TAILLE_MAX = 26  # Si la taille excède 26, les coordonnées nécessitent plusieurs lettres
-    def __init__(self, taille = 10):
+
+    def __init__(self, taille=10):
         if taille < 26:
             self.TAILLE = taille
         else:
@@ -86,34 +88,37 @@ class Grille:
                 ligne.append(Case(position))
             self.cases.append(ligne)
 
-    def coord_bataile_vers_grille(self, coordonnees):
+    @staticmethod
+    def coord_bataille_vers_grille(coordonnees):
         """
         Convertit les coordonnées de la bataille navale (ex : "A5" ou ("A", 5)) en coordonnées de la grille (ex: (1, 5)).
 
         :param coordonnees: coordonnées de la bataille navale
         :return: coordonnées équivalentes sur la grille
         """
-        copieCoordonnees = "".join(coordonnees)  # On assure que "copieCoordonnes" est une chaîne de caractères et non une liste ou un tuple
-        copieCoordonnees = copieCoordonnees.replace(" ", "")  # On enlève les espaces.
-        copieCoordonnees = copieCoordonnees.replace(".", "")  # On enlève les points
-        copieCoordonnees = copieCoordonnees.lower()  # On met tout en minuscules.
+        copie_coordonnees = "".join(coordonnees)  # On assure que "copieCoordonnes" est une chaîne de caractères et non une liste ou un tuple
+        copie_coordonnees = copie_coordonnees.replace(" ", "")  # On enlève les espaces.
+        copie_coordonnees = copie_coordonnees.replace(".", "")  # On enlève les points
+        copie_coordonnees = copie_coordonnees.lower()  # On met tout en minuscules.
 
         x = ""
         lettres = ""
-        while copieCoordonnees[0].isalpha():
-            lettres += copieCoordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copieCoordonnees".
-            copieCoordonnees = copieCoordonnees[1:len(copieCoordonnees)]
+        while copie_coordonnees[0].isalpha():
+            lettres += copie_coordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copie_coordonnees".
+            copie_coordonnees = copie_coordonnees[1:len(copie_coordonnees)]
         for c in lettres:
             x += str(string.ascii_letters(c).index())  # On transforme les lettres en nombres TODO: ATTENTION, index commence à 0
         x = int(x)
 
-        y = int(copieCoordonnees)
+        y = int(copie_coordonnees)
 
         return x, y
 
-    def coord_grille_vers_bataille(self, coordonnees):
+    @staticmethod
+    def coord_grille_vers_bataille(coordonnees):
         """
         Convertit les coordonnées de la grille vers celles de la bataille navale.
+
         :param coordonnees: tuple ou liste représentant les coordonnées sur la grille
         :return: chaîne de caractères des coordonnées équivalentes dans la bataille navale (ex : "B8")
         """

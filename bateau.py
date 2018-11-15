@@ -10,6 +10,7 @@ class AbstractBateau:
     """
     TAILLE = None  # l'attribut "TAILLE" est défini en dehors du constructeur, car chaque bateau d'un même type a la même taille
     TYPE = None  # le type est lui aussi commun à tous les bateaux d'une même classe
+
     def __init__(self, cases=None):
         """
         constructeur de la classe "AbstractBateau"
@@ -49,10 +50,10 @@ class AbstractBateau:
         """
         Méthode définissant si un bateau est coulé.
 
-        :return: booléen égal à "True" si le _bateau est coulé, et "False" sinon
+        :return: booléen égal à "True" si le bateau est coulé, et "False" sinon
         """
         for case in self._cases:
-            if case.etat != Etat.touche or case.etat != Etat.coule:
+            if case.etat != Etat.TOUCHE or case.etat != Etat.COULE:
                 return False
         return True
 
@@ -64,10 +65,10 @@ class AbstractBateau:
         """
         if case in self._cases:  # si la case est une case du bateau
             if not self.est_coule():  # si le bateau n'est pas coulé
-                case.etat = Etat.touche  # le bateau est touché en cette case
+                case.etat = Etat.TOUCHE  # le bateau est touché en cette case
                 if self.est_coule():
-                    for chaqueCase in self._cases:
-                        chaqueCase.etat = Etat.coule  # si le bateau est coulé, on change l'état de chaque case
+                    for chaque_case in self._cases:
+                        chaque_case.etat = Etat.COULE  # si le bateau est coulé, on change l'état de chaque case
             return True
         else:
             return False
@@ -77,7 +78,7 @@ class Torpilleur(AbstractBateau):
     """
     Classe héritant de "AbstractBateau" permettant de créer des torpilleurs.
     """
-    TAILLE = 2  # la taille et le type sont redéfini pour chaque classe héritant de "AbstractBateau"
+    TAILLE = 2  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
     TYPE = "torpilleur"
 
     def __init__(self, cases=None):
@@ -88,7 +89,7 @@ class SousMarin(AbstractBateau):
     """
     Classe héritant de "AbstractBateau" permettant de créer des sous-marins.
     """
-    TAILLE = 3  # la taille et le type sont redéfini pour chaque classe héritant de "AbstractBateau"
+    TAILLE = 3  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
     TYPE = "sous-marin"
 
     def __init__(self, cases=None):
@@ -99,7 +100,7 @@ class ContreTorpilleur(AbstractBateau):
     """
     Classe héritant de "AbstractBateau" permettant de créer des contre-torpilleurs.
     """
-    TAILLE = 3  # la taille et le type sont redéfini pour chaque classe héritant de "AbstractBateau"
+    TAILLE = 3  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
     TYPE = "contre-torpilleur"
 
     def __init__(self, cases=None):
@@ -110,7 +111,7 @@ class Croiseur(AbstractBateau):
     """
     Classe héritant de "AbstractBateau" permettant de créer des croiseurs.
     """
-    TAILLE = 4  # la taille et le type sont redéfini pour chaque classe héritant de "AbstractBateau"
+    TAILLE = 4  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
     TYPE = "croiseur"
 
     def __init__(self, cases=None):
@@ -121,7 +122,7 @@ class PorteAvions(AbstractBateau):
     """
     Classe héritant de "AbstractBateau" permettant de créer des porte-avions.
     """
-    TAILLE = 5  # la taille et le type sont redéfini pour chaque classe héritant de "AbstractBateau"
+    TAILLE = 5  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
     TYPE = "porte-avions"
 
     def __init__(self, cases=None):

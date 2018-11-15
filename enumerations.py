@@ -6,20 +6,18 @@ class Etat(IntEnum):
     """
     Énumération décrivant les états possibles d'une case.
 
-    "vide" veut dire que la case n'a rien de spécial.
-    "bateauInv" veut dire qu'un bateau est présent, mais que la case est blanche
-    "dansLEau" signifie que la case ne contient aucun bateau, mais qu'un coup a déjà été tiré dessus
-    "touche" veut dire qu'un bateau a été touché sur cette case
-    "coule" signifie qu'un bateau a été coulé ici
-    "selectionne" veut dire que la case est en train d'être cliquée
+    "VIDE" veut dire que la case n'a rien de spécial.
+    "BATEAU_INTACT" veut dire qu'un bateau est présent, mais que la case est blanche
+    "DANS_L_EAU" signifie que la case ne contient aucun bateau, mais qu'un coup a déjà été tiré dessus
+    "TOUCHE" veut dire qu'un bateau a été touché sur cette case
+    "COULE" signifie qu'un bateau a été coulé ici
     """
 
-    vide = 0
-    bateauInv = 1
-    dansLEau = 2
-    touche = 3
-    coule = 4
-    selectionne = 5
+    VIDE = 0
+    BATEAU_INTACT = 1
+    DANS_L_EAU = 2
+    TOUCHE = 3
+    COULE = 4
 
 
 @unique  # Assure que chaque valeur de l'énumération est unique
