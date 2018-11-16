@@ -8,6 +8,7 @@ class Tortue(turtle.Turtle):
     Cette classe permet de customiser la tortue fournie par le module "turtle".
     """
     COULEUR = "white"  # couleur de l'intértieur des cases
+
     def __init__(self):
         """
         constructeur de la classe "Tortue"
@@ -61,15 +62,24 @@ class Tortue(turtle.Turtle):
             self._dessiner_coule(case.milieu())
 
     def _dessiner_dans_l_eau(self, position):
-        pass
+        self.up()
+        self.goto(position)
+        self.down()
+        self.write("O")
         # TODO: définir l'image à dessiner
 
     def _dessiner_touche(self, position):
-        pass
+        self.up()
+        self.goto(position)
+        self.down()
+        self.write("+")
         # TODO: définir l'image à dessiner
 
     def _dessiner_coule(self, position):
-        pass
+        self.up()
+        self.goto(position)
+        self.down()
+        self.write("X")
         # TODO: définir l'image à dessiner
 
 
@@ -81,13 +91,13 @@ class Afficheur:
         """
         constructeur de la classe "Stylo"
 
-        :param mode: mode de dessin, il peut être une chaîne de caractères parmi "tortue" et "console" ou un nombre entre 0 et 1
+        :param grille: grille de jeu à afficher
         :raises: cette méthode lève l'exception "LookupError" lorsque le mode est invalide
         """
         self.grille = grille
         self.tortue = Tortue()
 
     def dessiner_grille_console(self):
-        pass
+        for i in range(len(self.grille.cases)):
+            for j in range(len)
         # TODO: définir un moyen de dessiner la grille dans la console
-

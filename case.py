@@ -82,14 +82,18 @@ class Grille:
             self.TAILLE = self.__class__.TAILLE_MAX
         self.cases = []
         for i in range(self.TAILLE):
-            ligne = []
+            colonne = []
             for j in range(self.TAILLE):
-                position = (j*Case.TAILLE, i*Case.TAILLE)
-                ligne.append(Case(position))
-            self.cases.append(ligne)
+                position = (i*Case.TAILLE, -j*Case.TAILLE)
+                colonne.append(Case(position))
+            self.cases.append(colonne)
 
     @staticmethod
-    def coord_bataille_vers_grille(coordonnees):
+    def coord_ecran_vers_index(coordonnees):
+        pass
+
+    @staticmethod
+    def coord_bataille_vers_index(coordonnees):
         """
         Convertit les coordonnées de la bataille navale (ex : "A5" ou ("A", 5)) en coordonnées de la grille (ex: (1, 5)).
 
@@ -107,21 +111,21 @@ class Grille:
             lettres += copie_coordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copie_coordonnees".
             copie_coordonnees = copie_coordonnees[1:len(copie_coordonnees)]
         for c in lettres:
-            x += str(string.ascii_letters(c).index())  # On transforme les lettres en nombres TODO: ATTENTION, index commence à 0
+            x += str(string.ascii_letters(c).index())  # On transforme les lettres en nombres TODO: Augmenter sécurité
         x = int(x)
 
-        y = int(copie_coordonnees)
+        y = int(copie_coordonnees) - 1
 
         return x, y
 
     @staticmethod
-    def coord_grille_vers_bataille(coordonnees):
+    def index_vers_coord_bataille(index):
         """
         Convertit les coordonnées de la grille vers celles de la bataille navale.
 
-        :param coordonnees: tuple ou liste représentant les coordonnées sur la grille
+        :param index: tuple ou liste représentant l'index de la case sur la grille
         :return: chaîne de caractères des coordonnées équivalentes dans la bataille navale (ex : "B8")
         """
-        lettre = string.ascii_uppercase[coordonnees[Coord.x]]  # On convertit la coordonnée x en lettre majuscule
-        nombre = coordonnees[Coord.y]
+        lettre = string.ascii_uppercase[index[Coord.x]]  # On convertit la coordonnée x en lettre majuscule
+        nombre = index[Coord.y] + 1
         return lettre + str(nombre)

@@ -1,4 +1,3 @@
-from case import *
 from fonctions import *
 
 
@@ -30,8 +29,8 @@ class AbstractBateau:
         et que
         :return: booléen informant sur le succès de l'opération
         """
-        if len(cases) == self.__class__.TAILLE and sont_alignees(cases):  # le "self.__class__.TAILLE" permet d'accéder à la taille du bateau,
-                                                                         # y compris avec les classes héritant de "AbstractBateau".
+        if len(cases) == self.__class__.TAILLE and sont_alignees(cases):  # Le "self.__class__.TAILLE" permet d'accéder à la taille du bateau,
+                                                                          # y compris avec les classes héritant de "AbstractBateau".
             for case in cases:
                 if case._bateau is not None:  # vérifie qu'un autre bateau n'est pas déjà présent sur une des nouvelles cases
                     return False  # renvoie "False" car un bateau est déjà présent
