@@ -111,8 +111,8 @@ class Afficheur:
                 if index_y == 0:
                     if index_x == 0:
                         self.ajouter_espacement_avant(index_y + 1)
-                        print(str(index_y + 1), end = "")
-                    print("_" + string.ascii_uppercase[index_x], end = "")
+                        print(str(index_y + 1), end="")
+                    print("_" + string.ascii_uppercase[index_x], end="")
                     if index_x == self.grille.TAILLE-1:
                         print("_")
                 self.dessiner_case_console(index_y, index_x)
@@ -126,10 +126,10 @@ class Afficheur:
         :return: "None"
         """
         case = self.grille.cases[index_y][index_x]
-        print("|", end = "")
-        print(case.caractere_etat(), end = "")
+        print("|", end="")
+        print(case.caractere_etat(), end="")
         if index_x == self.grille.TAILLE-1:
-            print("|\n", end = "")
+            print("|\n", end="")
 
     def ajouter_espacement_avant(self, nombre = None):
         """
@@ -139,7 +139,7 @@ class Afficheur:
         """
         espacement_total = self.decimales(self.grille.TAILLE)
         if nombre is None:
-             espacement = espacement_total
+            espacement = espacement_total
         else:
             espacement = espacement_total - self.decimales(nombre)
-        print(" "*espacement, end = "")  # Ajoute un espacement pour aligner les nombres à droite
+        print(" "*espacement, end="")  # Ajoute un espacement pour aligner les nombres à droite
