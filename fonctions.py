@@ -1,3 +1,4 @@
+# coding: utf-8
 from case import *
 
 
@@ -17,7 +18,7 @@ def sont_alignees(cases):
 
         premiere_case = cases[0]
         for i in range(1, len(cases)-1):  # on ne teste pas la première et la dernière, car cela a déjà été fait avant
-            if cases[i].position[coord] != premiere_case.position[coord]:  # si la case n'est pas alignée avec la première case TODO: Attention comparaison entre deux nombres flottants avec l'opérateur !=
+            if abs(cases[i].position[coord] - premiere_case.position[coord]) > 0.0001:  # si la case n'est pas alignée avec la première case
                 return False
         return True
     return False

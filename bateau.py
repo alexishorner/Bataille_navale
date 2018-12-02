@@ -1,3 +1,4 @@
+# coding: utf-8
 from fonctions import *
 
 
@@ -81,7 +82,7 @@ class Torpilleur(AbstractBateau):
     TYPE = "torpilleur"
 
     def __init__(self, cases=None):
-        super().__init__(cases)  # appelle le constructeur de la classe "AbstractBateau"
+        AbstractBateau.__init__(self, cases)  # appelle le constructeur de la classe "AbstractBateau"
 
 
 class SousMarin(AbstractBateau):
@@ -92,7 +93,7 @@ class SousMarin(AbstractBateau):
     TYPE = "sous-marin"
 
     def __init__(self, cases=None):
-        super().__init__(cases)  # appelle le constructeur de la classe "AbstractBateau"
+        AbstractBateau.__init__(self, cases)  # appelle le constructeur de la classe "AbstractBateau"
 
 
 class ContreTorpilleur(AbstractBateau):
@@ -103,7 +104,7 @@ class ContreTorpilleur(AbstractBateau):
     TYPE = "contre-torpilleur"
 
     def __init__(self, cases=None):
-        super().__init__(cases)  # appelle le constructeur de la classe "AbstractBateau"
+        AbstractBateau.__init__(self, cases)  # appelle le constructeur de la classe "AbstractBateau"
 
 
 class Croiseur(AbstractBateau):
@@ -114,7 +115,7 @@ class Croiseur(AbstractBateau):
     TYPE = "croiseur"
 
     def __init__(self, cases=None):
-        super().__init__(cases)  # appelle le constructeur de la classe "AbstractBateau"
+        AbstractBateau.__init__(self, cases)  # appelle le constructeur de la classe "AbstractBateau"
 
 
 class PorteAvions(AbstractBateau):
@@ -125,4 +126,4 @@ class PorteAvions(AbstractBateau):
     TYPE = "porte-avions"
 
     def __init__(self, cases=None):
-        super().__init__(cases)  # appelle le constructeur de la classe "AbstractBateau"
+        AbstractBateau.__init__(self, cases)  # appelle le constructeur de la classe "AbstractBateau"

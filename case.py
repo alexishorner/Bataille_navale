@@ -1,5 +1,32 @@
-from enumerations import *
+# coding: utf-8
+from enum import IntEnum, unique
 import string
+
+
+@unique  # Assure que chaque valeur de l'énumération est unique
+class Etat(IntEnum):
+    """
+    Énumération décrivant les états possibles d'une case.
+
+    "VIDE" veut dire que la case n'a rien de spécial.
+    "BATEAU_INTACT" veut dire qu'un bateau est présent, mais que la case est blanche
+    "DANS_L_EAU" signifie que la case ne contient aucun bateau, mais qu'un coup a déjà été tiré dessus
+    "TOUCHE" veut dire qu'un bateau a été touché sur cette case
+    "COULE" signifie qu'un bateau a été coulé ici
+    """
+
+    VIDE, BATEAU_INTACT, DANS_L_EAU, TOUCHE, COULE = range(5)
+
+
+@unique  # Assure que chaque valeur de l'énumération est unique
+class Coord(IntEnum):
+    """
+    Énumération permettant d'augmenter la lisibilité du code.
+
+    "x" représente l'index de la coordonnée x
+    "y" représente l'index de la coordonnée y
+    """
+    x, y = range(2)
 
 
 class Case:
@@ -7,6 +34,7 @@ class Case:
     Classe permettant de créer des objets de type case, composants élémentaires de la grille de jeu.
     """
     TAILLE = 10  # taille en pixels, le nom est en majuscules par convention, car c'est une constante
+    CARACTERES_ETAT = ["_", "_", "o", "x", "#"]
 
     def __init__(self, position, etat=Etat.VIDE, bateau=None):
         """
@@ -39,6 +67,9 @@ class Case:
         y = self.position[Coord.y]
         demi_longueur = self.TAILLE/2.0
         return x + demi_longueur, y + demi_longueur
+
+    def caractere_etat(self):
+        return self.CARACTERES_ETAT[self.etat]
 
     def set_bateau(self, bateau):
         """

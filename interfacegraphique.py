@@ -1,6 +1,10 @@
+# coding: utf-8
 # Attention les noms de variables ne contiennent pas d'accent, ce qui peut changer leur signification (par ex : côté devient cote)
-from enumerations import *
+from __future__ import print_function  # Permet d'utiliser la fonction print de python 3
+from case import Etat
 import turtle
+import string
+import math
 
 
 class Tortue(turtle.Turtle):
@@ -13,7 +17,7 @@ class Tortue(turtle.Turtle):
         """
         constructeur de la classe "Tortue"
         """
-        super().__init__()
+        turtle.Turtle.__init__(self)
         self.hideturtle()  # cache la tortue
         self.screen.tracer(0, 0)  # rend le dessin instantané, mais l'écran doit être rafraîchit manuellement en appelant "self.screen.update()"
         self.fillcolor(self.__class__.COULEUR)
@@ -54,33 +58,11 @@ class Tortue(turtle.Turtle):
         :param case: case dont il faut dessiner l'état
         :return: "None"
         """
-        if case.etat == Etat.DANS_L_EAU:
-            self._dessiner_dans_l_eau(case.milieu())
-        elif case.etat == Etat.TOUCHE:
-            self._dessiner_touche(case.milieu())
-        elif case.etat == Etat.COULE:
-            self._dessiner_coule(case.milieu())
-
-    def _dessiner_dans_l_eau(self, position):
-        self.up()
-        self.goto(position)
-        self.down()
-        self.write("O")
-        # TODO: définir l'image à dessiner
-
-    def _dessiner_touche(self, position):
-        self.up()
-        self.goto(position)
-        self.down()
-        self.write("+")
-        # TODO: définir l'image à dessiner
-
-    def _dessiner_coule(self, position):
-        self.up()
-        self.goto(position)
-        self.down()
-        self.write("X")
-        # TODO: définir l'image à dessiner
+        if case.etat != Etat.VIDE and case.etat != Etat.BATEAU_INTACT:
+            self.up()
+            self.goto(case.milieu())
+            self.down()
+            self.write(case.caractere_etat())
 
 
 class Afficheur:
@@ -97,7 +79,67 @@ class Afficheur:
         self.grille = grille
         self.tortue = Tortue()
 
+    def decimales(cls, nombre):
+        """
+        Nombre de décimales d'un nombre.
+
+        :param nombre: nombre dont on veut savoir les décimales
+        :return: nombre de décimales
+        """
+        return math.floor(math.log10(nombre)+0.00001)
+
     def dessiner_grille_console(self):
-        for i in range(len(self.grille.cases)):
-            for j in range(len)
+        """
+        Dessine la grille dans la console.
+
+        Exemple pour une grille de largeur 10 :
+              _A_B_C_D_E_F_G_H_I_J_
+             1|_|_|_|_|_|_|_|_|_|_|
+             2|_|_|_|_|_|_|_|_|_|_|
+             3|_|_|_|_|_|_|_|_|_|_|
+             4|_|_|_|_|_|_|_|_|_|_|
+             5|_|_|_|_|_|_|_|_|_|_|
+             6|_|_|_|_|_|_|_|_|_|_|
+             7|_|_|_|_|_|_|_|_|_|_|
+             8|_|_|_|_|_|_|_|_|_|_|
+             9|_|_|_|_|_|_|_|_|_|_|
+            10|_|_|_|_|_|_|_|_|_|_|
+        :return: "None"
+        """
+        for index_y in range(self.grille.TAILLE):
+            for index_x in range(self.grille.TAILLE):
+                if index_y == 0:
+                    if index_x == 0:
+                        self.ajouter_espacement_avant(index_y + 1)
+                        print(str(index_y + 1), end = "")
+                    print("_" + string.ascii_uppercase[index_x], end = "")
+                    if index_x == self.grille.TAILLE-1:
+                        print("_")
+                self.dessiner_case_console(index_y, index_x)
         # TODO: définir un moyen de dessiner la grille dans la console
+
+    def dessiner_case_console(self, index_y, index_x):
+        """
+        Dessine une case de la grille dans la console.
+        :param index_y: index de la ligne
+        :param index_x: index de la colonne
+        :return: "None"
+        """
+        case = self.grille.cases[index_y][index_x]
+        print("|", end = "")
+        print(case.caractere_etat(), end = "")
+        if index_x == self.grille.TAILLE-1:
+            print("|\n", end = "")
+
+    def ajouter_espacement_avant(self, nombre = None):
+        """
+        Ajoute un espacement avant la grille pour aligner les nombres sur la droite
+        :param nombre: nombre qui doit être aligné
+        :return: "None"
+        """
+        espacement_total = self.decimales(self.grille.TAILLE)
+        if nombre is None:
+             espacement = espacement_total
+        else:
+            espacement = espacement_total - self.decimales(nombre)
+        print(" "*espacement, end = "")  # Ajoute un espacement pour aligner les nombres à droite
