@@ -102,7 +102,7 @@ class Grille:
     """
     Classe représentant la grille de jeu de la bataille navale.
 
-    C'est un tableau en deux dimensions de cases
+    C'est un tableau en deux dimensions stockant des cases
     """
     TAILLE_MAX = 26  # Si la taille excède 26, les coordonnées nécessitent plusieurs lettres
 

@@ -5,6 +5,8 @@ from case import Etat
 import turtle
 import string
 import math
+from sys import platform
+import os
 
 
 class Tortue(turtle.Turtle):
@@ -74,7 +76,6 @@ class Afficheur:
         constructeur de la classe "Stylo"
 
         :param grille: grille de jeu à afficher
-        :raises: cette méthode lève l'exception "LookupError" lorsque le mode est invalide
         """
         self.grille = grille
         self.tortue = Tortue()
@@ -116,7 +117,6 @@ class Afficheur:
                     if index_x == self.grille.TAILLE-1:
                         print("_")
                 self.dessiner_case_console(index_y, index_x)
-        # TODO: définir un moyen de dessiner la grille dans la console
 
     def dessiner_case_console(self, index_y, index_x):
         """
@@ -143,3 +143,13 @@ class Afficheur:
         else:
             espacement = espacement_total - self.decimales(nombre)
         print(" "*espacement, end="")  # Ajoute un espacement pour aligner les nombres à droite
+
+    def _effacer_tout_console(self):
+        """
+        Fonction multi-plateforme permettant d'effacer le contenu de la console.
+        :return: "None"
+        """
+        if platform == "win32":  # La commande dépend du système d'exploitation
+            _ = os.system("cls")
+        else:
+            _ = os.system("clear")
