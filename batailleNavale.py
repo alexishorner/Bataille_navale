@@ -10,7 +10,7 @@ NOMBRE_CROISEURS = 1
 NOMBRE_PORTES_AVIONS = 1
 
 
-def ajouter_bateau(classe, nombre, liste):
+def ajouter_bateau(classe, nombre, grille, liste):
     """
     Ajoute des bateaux d'un certain type à une liste
     :param classe: Classe des bateaux à créer
@@ -20,17 +20,19 @@ def ajouter_bateau(classe, nombre, liste):
     """
     for i in range(nombre):
         liste.append(classe())  # classe() appelle le constructeur de la classe
-        
-def ajouter_bateaux(liste):
-    ajouter_bateau(bateau.Torpilleur, NOMBRE_TORPILLEURS, liste)
-    ajouter_bateau(bateau.SousMarin, NOMBRE_SOUS_MARINS, liste)
-    ajouter_bateau(bateau.ContreTorpilleur, NOMBRE_CONTRE_TORPILLEURS, liste)
-    ajouter_bateau(bateau.Croiseur, NOMBRE_CROISEURS, liste)
-    ajouter_bateau(bateau.PorteAvions, NOMBRE_PORTES_AVIONS, liste)
+
+
+def ajouter_bateaux(grille, liste):
+    ajouter_bateau(bateau.Torpilleur, NOMBRE_TORPILLEURS, grille, liste)
+    ajouter_bateau(bateau.SousMarin, NOMBRE_SOUS_MARINS, grille, liste)
+    ajouter_bateau(bateau.ContreTorpilleur, NOMBRE_CONTRE_TORPILLEURS, grille, liste)
+    ajouter_bateau(bateau.Croiseur, NOMBRE_CROISEURS, grille, liste)
+    ajouter_bateau(bateau.PorteAvions, NOMBRE_PORTES_AVIONS, grille, liste)
 
 
 if __name__ == "__main__":
     grille = Grille()
     interface = Afficheur(grille)
     bateaux = []
-    ajouter_bateaux(bateaux)
+    ajouter_bateaux(grille, bateaux)
+
