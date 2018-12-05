@@ -20,12 +20,13 @@ class AbstractBateau:
 
         :param cases: tuple contenant les cases occupées par le _bateau
         """
-        cases_libres = True
-        for case in cases:
-            if case._bateau is not None and case._bateau is not self:
-                cases_libres = False
-        if cases_libres:
-            self._cases = list(cases)
+        if cases is not None:
+            cases_libres = True
+            for case in cases:
+                if case._bateau is not None and case._bateau is not self:
+                    cases_libres = False
+            if cases_libres:
+                self._cases = list(cases)
 
     def set_cases(self, cases):
         """

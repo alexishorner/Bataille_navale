@@ -119,6 +119,9 @@ class Grille:
                 colonne.append(Case(position))
             self.cases.append(colonne)
 
+    def placer_bateaux(self, bateaux):
+        pass
+
     @staticmethod
     def coord_ecran_vers_index(coordonnees):
         pass

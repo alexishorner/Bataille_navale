@@ -35,4 +35,5 @@ if __name__ == "__main__":
     interface = Afficheur(grille)
     bateaux = []
     ajouter_bateaux(grille, bateaux)
+    interface.dessiner_grille_console()
 

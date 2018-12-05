@@ -87,7 +87,13 @@ class Afficheur:
         :param nombre: nombre dont on veut savoir les décimales
         :return: nombre de décimales
         """
-        return math.floor(math.log10(nombre)+0.00001)
+        return int(math.floor(math.log10(nombre)+0.00001)+1)
+
+    def dessiner_premiere_ligne_console(self):
+        self.ajouter_espacement_avant()
+        for index_x in range(self.grille.TAILLE):
+            print("_" + string.ascii_uppercase[index_x], end="")
+        print("_\n", end="")
 
     def dessiner_grille_console(self):
         """
@@ -109,13 +115,13 @@ class Afficheur:
         """
         for index_y in range(self.grille.TAILLE):
             for index_x in range(self.grille.TAILLE):
-                if index_y == 0:
-                    if index_x == 0:
-                        self.ajouter_espacement_avant(index_y + 1)
-                        print(str(index_y + 1), end="")
-                    print("_" + string.ascii_uppercase[index_x], end="")
-                    if index_x == self.grille.TAILLE-1:
-                        print("_")
+                if index_y == 0 and index_x == 0:
+                    self.dessiner_premiere_ligne_console()
+
+                if index_x == 0:
+                    self.ajouter_espacement_avant(index_y+1)
+                    print(str(index_y+1), end="")
+
                 self.dessiner_case_console(index_y, index_x)
 
     def dessiner_case_console(self, index_y, index_x):
@@ -131,7 +137,7 @@ class Afficheur:
         if index_x == self.grille.TAILLE-1:
             print("|\n", end="")
 
-    def ajouter_espacement_avant(self, nombre = None):
+    def ajouter_espacement_avant(self, nombre=None):
         """
         Ajoute un espacement avant la grille pour aligner les nombres sur la droite
         :param nombre: nombre qui doit être aligné
