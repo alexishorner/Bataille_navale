@@ -1,6 +1,7 @@
 # coding: utf-8
 from enum import IntEnum, unique
 import string
+from numpy import array
 
 
 def trier_bateaux_par_taille(bateaux, decroissant = False):
@@ -201,27 +202,75 @@ class Grille:
                 colonne.append(Case(position))
             self.cases.append(colonne)
 
+    @staticmethod
+    def element_dans_liste(element, liste):
+        """
+        Méthode statique déterminant si un élément est contenu dans une liste
+
+        :param element: élément à chercher
+        :param liste: liste dans laquelle il faut chercher
+        :return: "True" si la liste contient l'élément, "False" sinon
+        """
+        return element in array(liste).flat
+
     def cases_libres(self):
         """
-        Fonction retournant les cases libres de la grille
+        Méthode retournant des groupes de cases libres alignées et adjacentes.
+        Exemple:
+             _A_B_C_D_E_
+            1|_|x|_|_|_|
+            2|_|x|x|x|x|
+            3|_|x|_|x|x|
+            4|_|_|x|x|x|
+            5|_|_|x|_|_|
+        Ici la liste sera la suivante : [[C1, D1, E1], [C3], [A4, B4], [A5, B5], [D5, E5], [A1, A2, A3, A4], [B4, B5]]
+
         :return: liste contenant les cases libres
         """
-        libres = []
-        for ligne in self.cases:
-            libres_sur_ligne = []
-            for case in ligne:
-                if case.bateau() is None:  # Si la case est vide
-                    libres_sur_ligne.append(case)
-                else:
-                    libres_sur_ligne.append(None)
-            libres.append(libres_sur_ligne)
-        return libres
+        libres_horizontales = []
+        libres_verticales = []
+        for l in range(len(self.cases)):
+            for c in range(len(self.cases[l])):
+                if not self.element_dans_liste(self.cases[l][c], libres_horizontales):  # Si la case n'a pas déjà été
+                                                                                        # comptée horizontalement
+                    groupe_horizontal = []
+                    i = 0
+                    while (self.cases[l][c+i].bateau() is None and   # Tant que la case est vide et
+                          c+i < len(self.cases[l])):                # qu'on est dans les bornes
+                        groupe_horizontal.append(self.cases[l][c+i])
+                        i += 1
+                    if groupe_horizontal:  # Si le groupe horizontal contient au moins une case
+                        libres_horizontales.append(groupe_horizontal)  # ajoute le groupe s'il contient au moins une case
+                if not self.element_dans_liste(self.cases[l][c], libres_verticales):    # Si la case n'a pas déjà été
+                                                                                        # comptée verticalement
+                    groupe_vertical = []
+                    i = 0
+                    while (self.cases[l+i][c].bateau() is None and  # Tant que la case est vide et
+                           l+i < len(self.cases)):                  # qu'on est dans les bornes
+                        groupe_vertical.append(self.cases[l+i][c])
+                        i += 1
+                    if groupe_vertical:  # Si le groupe vertical contient au moins une case
+                        libres_verticales.append(groupe_vertical)  # ajoute le groupe s'il contient au moins une case
+
+        # On enlève les cases qui sont comptées à double alors qu'elle ne devraient pas
+        for groupe in libres_horizontales:
+            if len(groupe) == 1:  # Si c'est une case isolée horizontalement
+                if self.element_dans_liste(groupe[0], libres_verticales):  # Si la case est déjà comptée verticalement
+                    libres_horizontales.remove(groupe)
+        for groupe in libres_verticales:
+            if len(groupe) == 1:  # Si c'est une case isolée verticalement
+                if self.element_dans_liste(groupe[0], libres_horizontales):  # Si la case est déjà comptée horizontalement
+                    libres_verticales.remove(groupe)
+
+        return libres_horizontales + libres_verticales  # On renvoie les deux listes concaténées
+
 
     def placer_bateaux(self, bateaux):
         nombre_de_cases = 0
         for bateau in bateaux:
             nombre_de_cases += bateau.TAILLE
         bateaux_a_placer = trier_bateaux_par_taille(bateaux)
+        # TODO: terminer cette méthode
 
 
     @staticmethod
