@@ -1,6 +1,7 @@
 # coding: utf-8
 
-from case import sont_alignees
+from case import Etat, Case
+
 
 class AbstractBateau:
     """
@@ -36,10 +37,13 @@ class AbstractBateau:
         et que
         :return: booléen informant sur le succès de l'opération
         """
-        if len(cases) == self.__class__.TAILLE and sont_alignees(cases):  # Le "self.__class__.TAILLE" permet d'accéder à la taille du bateau,
-                                                                          # y compris avec les classes héritant de "AbstractBateau".
+        if len(cases) == self.__class__.TAILLE and Case.sont_alignees(cases) and Case.sont_adjacentes(cases):
+            # Le "self.__class__.TAILLE" permet d'accéder à la taille du bateau,
+            # y compris avec les classes héritant de "AbstractBateau".
+            # Cette condition vérifie qu'il y a le bon nombre de cases, qu'elle sont alignées et
+            # qu'il n'y a pas d'espace les séparant.
             for case in cases:
-                if case._bateau is not None:  # vérifie qu'un autre bateau n'est pas déjà présent sur une des nouvelles cases
+                if case.bateau() is not None:  # vérifie qu'un autre bateau n'est pas déjà présent sur une des nouvelles cases
                     return False  # renvoie "False" car un bateau est déjà présent
 
             for case in self._cases:

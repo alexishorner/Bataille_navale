@@ -3,36 +3,6 @@ from enum import IntEnum, unique
 import string
 
 
-def sont_cote_a_cote(cases):
-    for case1 in cases:
-        autres_cases = list(cases).remove(case1)  # Crée une copie de la liste qui ne contient pas "case1"
-        a_un_voisin = False
-        for case2 in cases:
-            if case1
-
-
-def sont_alignees(cases):
-    """
-    Fonction déterminant si plusieurs cases sont alignées entre elles.
-    :param cases: liste d'objets de type "Case" dont on veut tester l'alignement
-    :return: booléen indiquant si les cases sont alignées
-    """
-    if cases is not None and len(cases) > 0:
-        if cases[0].position[Coord.x] == cases[-1].position[Coord.x]:  # si la première case a la même coordonnée x que la dernière
-            coord = Coord.x  # on défini une variable indiquant qu'il faut regarder l'alignement sur x
-        elif cases[0].position[Coord.y] == cases[-1].position[Coord.y]:  # si la première case a la même coordonnée y que la dernière
-            coord = Coord.y  # on défini une variable indiquant qu'il faut regarder l'alignement sur y
-        else:
-            return False
-
-        premiere_case = cases[0]
-        for i in range(1, len(cases)-1):  # on ne teste pas la première et la dernière, car cela a déjà été fait avant
-            if abs(cases[i].position[coord] - premiere_case.position[coord]) > 0.0001:  # si la case n'est pas alignée avec la première case
-                return False
-        return True
-    return False
-
-
 def trier_bateaux_par_taille(bateaux, decroissant = False):
     """
     Trie une liste de bateaux par taille
@@ -90,6 +60,63 @@ class Case:
         self.etat = etat
         self._bateau = bateau
 
+    @staticmethod
+    def sont_alignees(cases):
+        """
+        Fonction déterminant si plusieurs cases sont alignées entre elles.
+        :param cases: liste d'objets de type "Case" dont on veut tester l'alignement
+        :return: booléen indiquant si les cases sont alignées
+        """
+        if cases is not None and len(cases) > 0:
+            if cases[0].position[Coord.x] == cases[-1].position[Coord.x]:  # si la première case a la même coordonnée x que la dernière
+                coord = Coord.x  # on défini une variable indiquant qu'il faut regarder l'alignement sur x
+            elif cases[0].position[Coord.y] == cases[-1].position[Coord.y]:  # si la première case a la même coordonnée y que la dernière
+                coord = Coord.y  # on défini une variable indiquant qu'il faut regarder l'alignement sur y
+            else:
+                return False
+
+            premiere_case = cases[0]
+            for i in range(1, len(cases)-1):  # on ne teste pas la première et la dernière, car cela a déjà été fait avant
+                if abs(cases[i].position[coord] - premiere_case.position[coord]) > 0.0001:  # si la case n'est pas alignée avec la première case
+                    return False
+            return True
+        return False
+
+    @classmethod
+    def sont_adjacentes(cls, cases):
+        """
+        Vérifie si un plusieurs cases sont adjacentes
+
+        Exemples:
+            1)
+             _ _ _ _ _
+            |_|_|_|_|_|
+                |_|_
+                  |_|
+            Cette configuration renverra "False", car la case du bas est isolée (les sommets ne comptent pas)
+            2)
+             _ _ _ _ _
+            |_|_|_|_|_|
+                |_|_
+                |_|_|
+            Cette configuration renverra "True", car chaque case a au moins une voisine
+        :param cases: cases à vérifier
+        :return: "True" si toutes les cases ont au moins un voisin, "False" sinon
+        """
+        for case1 in cases:
+            autres_cases = list(cases)  # Crée une copie de la liste "cases"
+            autres_cases.remove(case1)  # Enlève la case "case1"
+            case1_a_un_voisin = False
+            for case2 in autres_cases:
+                if cls.sont_alignees((case1, case2)):
+                    separation_horizontale = abs(case1.position[Coord.x] - case2.position[Coord.x])
+                    separation_verticale = abs(case1.position[Coord.y] - case2.position[Coord.y])
+                    if separation_horizontale < cls.TAILLE or separation_verticale < cls.TAILLE:
+                        case1_a_un_voisin = True
+            if not case1_a_un_voisin:
+                return False
+        return True
+
     def carre(self):
         """
         :return: carré occupé par la case
@@ -109,12 +136,16 @@ class Case:
         return x + demi_longueur, y + demi_longueur
 
     def caractere_etat(self):
+        """
+        :return: caractère symbolisant l'état de la case
+        """
         return self.CARACTERES_ETAT[self.etat]
 
     def bateau(self):
         """
         Accesseur de l'attribut "_bateau". Il permet d'accéder à l'attribut.
-        :return:
+
+        :return: attribut "_bateau"
         """
         return self._bateau
 
@@ -179,7 +210,7 @@ class Grille:
         for ligne in self.cases:
             libres_sur_ligne = []
             for case in ligne:
-                if case.bateau() is None:
+                if case.bateau() is None:  # Si la case est vide
                     libres_sur_ligne.append(case)
                 else:
                     libres_sur_ligne.append(None)
@@ -191,7 +222,7 @@ class Grille:
         for bateau in bateaux:
             nombre_de_cases += bateau.TAILLE
         bateaux_a_placer = trier_bateaux_par_taille(bateaux)
-        pass
+
 
     @staticmethod
     def coord_ecran_vers_index(coordonnees):
