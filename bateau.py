@@ -1,6 +1,6 @@
 # coding: utf-8
-from fonctions import *
 
+from case import sont_alignees
 
 class AbstractBateau:
     """
@@ -49,8 +49,7 @@ class AbstractBateau:
             for case in self._cases:
                 case.set_bateau(self)  # ajoute le bateau aux nouvelles cases
             return True  # renvoie "True", car les cases ont bien été remplacées
-        else:
-            return False  # renvoie "False", car l'opération a échoué
+        return False  # renvoie "False", car l'opération a échoué
 
     def est_coule(self):
         """

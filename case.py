@@ -3,6 +3,46 @@ from enum import IntEnum, unique
 import string
 
 
+def sont_cote_a_cote(cases):
+    for case1 in cases:
+        autres_cases = list(cases).remove(case1)  # Crée une copie de la liste qui ne contient pas "case1"
+        a_un_voisin = False
+        for case2 in cases:
+            if case1
+
+
+def sont_alignees(cases):
+    """
+    Fonction déterminant si plusieurs cases sont alignées entre elles.
+    :param cases: liste d'objets de type "Case" dont on veut tester l'alignement
+    :return: booléen indiquant si les cases sont alignées
+    """
+    if cases is not None and len(cases) > 0:
+        if cases[0].position[Coord.x] == cases[-1].position[Coord.x]:  # si la première case a la même coordonnée x que la dernière
+            coord = Coord.x  # on défini une variable indiquant qu'il faut regarder l'alignement sur x
+        elif cases[0].position[Coord.y] == cases[-1].position[Coord.y]:  # si la première case a la même coordonnée y que la dernière
+            coord = Coord.y  # on défini une variable indiquant qu'il faut regarder l'alignement sur y
+        else:
+            return False
+
+        premiere_case = cases[0]
+        for i in range(1, len(cases)-1):  # on ne teste pas la première et la dernière, car cela a déjà été fait avant
+            if abs(cases[i].position[coord] - premiere_case.position[coord]) > 0.0001:  # si la case n'est pas alignée avec la première case
+                return False
+        return True
+    return False
+
+
+def trier_bateaux_par_taille(bateaux, decroissant = False):
+    """
+    Trie une liste de bateaux par taille
+    :param bateaux: liste de bateaux
+    :param decroissant: détermine si la liste doit être triée dans l'ordre croissant ou décroissant
+    :return: liste triée
+    """
+    return sorted(bateaux, key=lambda x: x.TAILLE, reverse=decroissant)
+
+
 @unique  # Assure que chaque valeur de l'énumération est unique
 class Etat(IntEnum):
     """
@@ -40,8 +80,8 @@ class Case:
         """
         constructeur de la classe "Case"
 
-        ATTENTION : comme suggéré par le caractère "_" dans le nom de l'attribut _bateau,
-        il ne faut pas modifier cet attribut directement, mais faire appel à la méthode "setBateau(self, bateau)"
+        ATTENTION : comme suggéré par le caractère "_" dans le nom de l'attribut "_bateau",
+        il ne faut pas modifier cet attribut directement, mais faire appel à la méthode "set_bateau(self, bateau)"
         :param position: position cartésienne du coin inférieur gauche de la case sur la grille
         :param etat: État de la case, lire la docstring de la classe "Etat" pour plus d'informations.
         :param bateau: Bateau présent sur cette case. Si la case est vide, ce paramètre vaut "None"
@@ -71,13 +111,22 @@ class Case:
     def caractere_etat(self):
         return self.CARACTERES_ETAT[self.etat]
 
+    def bateau(self):
+        """
+        Accesseur de l'attribut "_bateau". Il permet d'accéder à l'attribut.
+        :return:
+        """
+        return self._bateau
+
     def set_bateau(self, bateau):
         """
         Mutateur de l'attribut "_bateau". Il sert à changer de bateau de manière sécurisée à condition qu'aucun coup n'ait été tiré.
 
         :param bateau: nouveau bateau
-        :return: pas de sortie spécifiée
+        :return: renvoie le succès de l'opération
         """
+        if self.etat != Etat.VIDE and self.etat != Etat.BATEAU_INTACT:
+            return False
         if bateau is not None:
             if self.etat == Etat.VIDE:
                 self.etat = Etat.BATEAU_INTACT
@@ -85,6 +134,7 @@ class Case:
             if self.etat == Etat.BATEAU_INTACT:
                 self.etat = Etat.VIDE
         self._bateau = bateau
+        return True
 
     def recevoir_tir(self):
         """
@@ -102,7 +152,8 @@ class Grille:
     """
     Classe représentant la grille de jeu de la bataille navale.
 
-    C'est un tableau en deux dimensions stockant des cases
+    C'est un tableau en deux dimensions stockant des cases.
+    Les cases sont accédées de la manière suivante: self.cases[ligne][colonne]
     """
     TAILLE_MAX = 26  # Si la taille excède 26, les coordonnées nécessitent plusieurs lettres
 
@@ -119,7 +170,27 @@ class Grille:
                 colonne.append(Case(position))
             self.cases.append(colonne)
 
+    def cases_libres(self):
+        """
+        Fonction retournant les cases libres de la grille
+        :return: liste contenant les cases libres
+        """
+        libres = []
+        for ligne in self.cases:
+            libres_sur_ligne = []
+            for case in ligne:
+                if case.bateau() is None:
+                    libres_sur_ligne.append(case)
+                else:
+                    libres_sur_ligne.append(None)
+            libres.append(libres_sur_ligne)
+        return libres
+
     def placer_bateaux(self, bateaux):
+        nombre_de_cases = 0
+        for bateau in bateaux:
+            nombre_de_cases += bateau.TAILLE
+        bateaux_a_placer = trier_bateaux_par_taille(bateaux)
         pass
 
     @staticmethod
