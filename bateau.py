@@ -34,10 +34,13 @@ class AbstractBateau:
         Méthode permettant de modifier la valeur de "_cases".
 
         Il vérifie que le nombre et l'alignement des cases est valide
-        et que
+        et que celles-ci sont adjacentes.
         :return: booléen informant sur le succès de l'opération
         """
-        if len(cases) == self.__class__.TAILLE and Case.sont_alignees(cases) and Case.sont_adjacentes(cases):
+        if not cases:  # Si "cases" est vide ou vaut "None"
+            for case in self._cases:
+                case.set_bateau(None)
+        elif len(cases) == self.TAILLE and Case.sont_alignees(cases) and Case.sont_adjacentes(cases):
             # Le "self.__class__.TAILLE" permet d'accéder à la taille du bateau,
             # y compris avec les classes héritant de "AbstractBateau".
             # Cette condition vérifie qu'il y a le bon nombre de cases, qu'elle sont alignées et
@@ -52,8 +55,10 @@ class AbstractBateau:
             self._cases = cases
             for case in self._cases:
                 case.set_bateau(self)  # ajoute le bateau aux nouvelles cases
-            return True  # renvoie "True", car les cases ont bien été remplacées
-        return False  # renvoie "False", car l'opération a échoué
+        else:
+            return False  # renvoie "False", car l'opération a échoué
+
+        return True  # renvoie "True", car les cases ont bien été remplacées
 
     def est_coule(self):
         """

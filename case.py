@@ -1,6 +1,7 @@
 # coding: utf-8
 from enum import IntEnum, unique
 import string
+import random
 from numpy import array
 
 
@@ -45,7 +46,7 @@ class Case:
     Classe permettant de créer des objets de type case, composants élémentaires de la grille de jeu.
     """
     TAILLE = 10  # taille en pixels, le nom est en majuscules par convention, car c'est une constante
-    CARACTERES_ETAT = ["_", "_", "o", "x", "#"]
+    CARACTERES_ETAT = ["_", "*", "o", "x", "#"]  # TODO: remettre "_" (tiret en bas) à la place de "*"
 
     def __init__(self, position, etat=Etat.VIDE, bateau=None):
         """
@@ -152,19 +153,15 @@ class Case:
 
     def set_bateau(self, bateau):
         """
-        Mutateur de l'attribut "_bateau". Il sert à changer de bateau de manière sécurisée à condition qu'aucun coup n'ait été tiré.
+        Mutateur de l'attribut "_bateau". Il sert à changer de bateau de manière sécurisée.
 
         :param bateau: nouveau bateau
-        :return: renvoie le succès de l'opération
+        :return: "None"
         """
-        if self.etat != Etat.VIDE and self.etat != Etat.BATEAU_INTACT:
-            return False
-        if bateau is not None:
-            if self.etat == Etat.VIDE:
-                self.etat = Etat.BATEAU_INTACT
+        if bateau is None:
+            self.etat = Etat.VIDE
         else:
-            if self.etat == Etat.BATEAU_INTACT:
-                self.etat = Etat.VIDE
+            self.etat = Etat.BATEAU_INTACT
         self._bateau = bateau
         return True
 
@@ -213,6 +210,12 @@ class Grille:
         """
         return element in array(liste).flat
 
+    def vider(self):
+        for ligne in self.cases:
+            for case in ligne:
+                if case.bateau() is not None:
+                    case.bateau().set_cases(None)  # enlève les bateaux un à un
+
     def cases_libres(self):
         """
         Méthode retournant des groupes de cases libres alignées et adjacentes.
@@ -235,8 +238,8 @@ class Grille:
                                                                                         # comptée horizontalement
                     groupe_horizontal = []
                     i = 0
-                    while (self.cases[l][c+i].bateau() is None and   # Tant que la case est vide et
-                          c+i < len(self.cases[l])):                # qu'on est dans les bornes
+                    while (c+i < len(self.cases[l]) and          # Tant qu'on est dans les bornes et
+                          self.cases[l][c+i].bateau() is None):  # que la case est vide
                         groupe_horizontal.append(self.cases[l][c+i])
                         i += 1
                     if groupe_horizontal:  # Si le groupe horizontal contient au moins une case
@@ -245,14 +248,14 @@ class Grille:
                                                                                         # comptée verticalement
                     groupe_vertical = []
                     i = 0
-                    while (self.cases[l+i][c].bateau() is None and  # Tant que la case est vide et
-                           l+i < len(self.cases)):                  # qu'on est dans les bornes
+                    while (l+i < len(self.cases) and                # Tant qu'on est dans les bornes et
+                           self.cases[l+i][c].bateau() is None):    # que la case est vide
                         groupe_vertical.append(self.cases[l+i][c])
                         i += 1
                     if groupe_vertical:  # Si le groupe vertical contient au moins une case
                         libres_verticales.append(groupe_vertical)  # ajoute le groupe s'il contient au moins une case
 
-        # On enlève les cases qui sont comptées à double alors qu'elle ne devraient pas
+        # On enlève les cases qui sont comptées à double alors qu'elle ne devaient pas
         for groupe in libres_horizontales:
             if len(groupe) == 1:  # Si c'est une case isolée horizontalement
                 if self.element_dans_liste(groupe[0], libres_verticales):  # Si la case est déjà comptée verticalement
@@ -262,16 +265,39 @@ class Grille:
                 if self.element_dans_liste(groupe[0], libres_horizontales):  # Si la case est déjà comptée horizontalement
                     libres_verticales.remove(groupe)
 
-        return libres_horizontales + libres_verticales  # On renvoie les deux listes concaténées
+        cases_libres = libres_horizontales + libres_verticales
+        return sorted(cases_libres, key=lambda x: len(x))  # On renvoie les groupes de cases par ordre croissant de taille
 
+    def groupes_de_cases_libres(self, longueur):
+        """
+        Fonction renvoyant tous les groupes de cases libres possibles ayant une certaine longueur.
+
+        :param longueur: longueur des groupes
+        :return: liste contenant les groupes de cases libres
+        """
+        groupes = self.cases_libres()
+        for groupe in groupes:
+            if len(groupe) < longueur:
+                groupes.remove(groupe)  # On enlève tous les groupes qui sont trop petits
+            elif len(groupe) > longueur:
+                for i in range(len(groupe)-longueur):
+                    groupes.extend(groupe[i:longueur+i])    # Si un groupe est trop grand, on le divise en plusieurs
+                                                            # groupes possibles
+        return groupes
 
     def placer_bateaux(self, bateaux):
-        nombre_de_cases = 0
-        for bateau in bateaux:
-            nombre_de_cases += bateau.TAILLE
-        bateaux_a_placer = trier_bateaux_par_taille(bateaux)
-        # TODO: terminer cette méthode
+        """
+        Fonction permettant de placer des bateaux de manière aléatoire sur la grille
 
+        :param bateaux: bateaux à placer
+        :return: réussite de l'opération
+        """
+        bateaux_a_placer = trier_bateaux_par_taille(bateaux, True)  # On trie les bateaux dans l'ordre décroissant pour
+                                                                    # placer les plus grands en premier
+        for bateau in bateaux_a_placer:
+            cases_possibles = self.groupes_de_cases_libres(bateau.TAILLE)  # TODO: attention bugs possibles si aucun groupe n'est trouvé
+            bateau.set_cases(random.choice(cases_possibles))  # Sélectionne un groupe de cases aléatoire pour les cases du bateau
+        return True
 
     @staticmethod
     def coord_ecran_vers_index(coordonnees):
