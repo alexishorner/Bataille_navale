@@ -275,8 +275,9 @@ class Grille:
         :param longueur: longueur des groupes
         :return: liste contenant les groupes de cases libres
         """
-        groupes = self.cases_libres()
-        for groupe in groupes:
+        cases_libres = self.cases_libres()
+        groupes = list(cases_libres)  # On crée une copie des cases libres
+        for groupe in cases_libres:
             if len(groupe) < longueur:
                 groupes.remove(groupe)  # On enlève tous les groupes qui sont trop petits
             elif len(groupe) > longueur:
@@ -296,6 +297,8 @@ class Grille:
                                                                     # placer les plus grands en premier
         for bateau in bateaux_a_placer:
             cases_possibles = self.groupes_de_cases_libres(bateau.TAILLE)  # TODO: attention bugs possibles si aucun groupe n'est trouvé
+            for item in cases_possibles:
+                print(item)
             bateau.set_cases(random.choice(cases_possibles))  # Sélectionne un groupe de cases aléatoire pour les cases du bateau
         return True
 
