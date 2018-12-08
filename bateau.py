@@ -21,6 +21,7 @@ class AbstractBateau:
 
         :param cases: tuple contenant les cases occupées par le _bateau
         """
+        self._cases = []
         if cases is not None:
             cases_libres = True
             for case in cases:

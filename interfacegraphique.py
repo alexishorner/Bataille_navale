@@ -159,3 +159,9 @@ class Afficheur:
             _ = os.system("cls")
         else:
             _ = os.system("clear")
+
+    def boucle_des_evenements(self):
+        recommencer = True
+        while recommencer:
+            entree = raw_input("\n>>> ")
+            # TODO: terminer méthode

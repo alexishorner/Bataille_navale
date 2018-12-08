@@ -282,8 +282,9 @@ class Grille:
                 groupes.remove(groupe)  # On enlève tous les groupes qui sont trop petits
             elif len(groupe) > longueur:
                 for i in range(len(groupe)-longueur):
-                    groupes.extend(groupe[i:longueur+i])    # Si un groupe est trop grand, on le divise en plusieurs
+                    groupes.append(groupe[i:longueur+i])    # Si un groupe est trop grand, on le divise en plusieurs
                                                             # groupes possibles
+                groupes.remove(groupe)
         return groupes
 
     def placer_bateaux(self, bateaux):
@@ -297,8 +298,6 @@ class Grille:
                                                                     # placer les plus grands en premier
         for bateau in bateaux_a_placer:
             cases_possibles = self.groupes_de_cases_libres(bateau.TAILLE)  # TODO: attention bugs possibles si aucun groupe n'est trouvé
-            for item in cases_possibles:
-                print(item)
             bateau.set_cases(random.choice(cases_possibles))  # Sélectionne un groupe de cases aléatoire pour les cases du bateau
         return True
 

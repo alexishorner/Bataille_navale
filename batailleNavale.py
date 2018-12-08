@@ -2,6 +2,7 @@
 from case import Grille
 from interfacegraphique import Afficheur
 import bateau
+import time
 
 NOMBRE_TORPILLEURS = 1
 NOMBRE_SOUS_MARINS = 1
