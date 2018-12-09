@@ -187,7 +187,8 @@ class Grille:
     """
     TAILLE_MAX = 26  # Si la taille excède 26, les coordonnées nécessitent plusieurs lettres
 
-    def __init__(self, taille=10):
+    def __init__(self, bateaux, taille=10):
+        self.bateaux = bateaux
         if taille < 26:
             self.TAILLE = taille
         else:
@@ -288,14 +289,14 @@ class Grille:
                 groupes.remove(groupe)
         return groupes
 
-    def placer_bateaux(self, bateaux):
+    def placer_bateaux(self):
         """
         Fonction permettant de placer des bateaux de manière aléatoire sur la grille
 
         :param bateaux: bateaux à placer
         :return: réussite de l'opération
         """
-        bateaux_a_placer = trier_bateaux_par_taille(bateaux, True)  # On trie les bateaux dans l'ordre décroissant pour
+        bateaux_a_placer = trier_bateaux_par_taille(self.bateaux, True)  # On trie les bateaux dans l'ordre décroissant pour
                                                                     # placer les plus grands en premier
         for bateau in bateaux_a_placer:
             cases_possibles = self.groupes_de_cases_libres(bateau.TAILLE)  # TODO: attention bugs possibles si aucun groupe n'est trouvé

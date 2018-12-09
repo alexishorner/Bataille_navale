@@ -10,7 +10,7 @@ from sys import platform
 import os
 
 
-def recevoir_entree(texte_a_afficher = ""):
+def recevoir_entree(texte_a_afficher=""):
     """
     Fonction équivalente à "raw_input()", mais compatible avec python 3
 
@@ -93,6 +93,12 @@ class Afficheur:
         self.grille = grille
         self.tortue = Tortue()
         self.nombre_de_coups = 0
+
+
+
+    def actualiser(self):
+        self.dessiner_grille_console()
+        self.tortue.screen.update()
 
     @staticmethod
     def afficher_erreur():
@@ -201,9 +207,21 @@ class Afficheur:
         :return: "None"
         """
         if platform == "win32":  # La commande dépend du système d'exploitation
-            _ = os.system("cls")
+            _ = os.system("cls")    # Le "_" avant le signe "=" sert à récupérer le retour de la fonction pour empêcher
+                                    # qu'il soit imprimé
         else:
-            _ = os.system("clear")
+            _ = os.system("clear")  # Idem
+
+    def joueur_a_gagne(self):
+        """
+        Détermine si le joueur a gagné
+
+        :return: Booléen indiquant si le joueur a gagné
+        """
+        for bateau in self.grille.bateaux:
+            if not bateau.est_coule():
+                return False
+        return True
 
     def boucle_des_evenements(self):
         """
@@ -218,19 +236,24 @@ class Afficheur:
             if entree in ("quitter", "q"):
                 recommencer = not self.confirmer_quitter()
             else:
-                retour = self.grille.tirer(entree)
+                retour = self.grille.tirer(entree)  # On tire sur la case et on enregistre le retour de la méthode
                 if retour is None:
                     print("\nVous avez déjà tiré sur cette case.")
                 elif not retour and retour not in (Etat.DANS_L_EAU, Etat.TOUCHE, Etat.COULE):
                     self.afficher_erreur()
-                else:
+                else:  # "retour" vaut soit "Etat.DANS_L_EAU", soit "ETAT.TOUCHE", soit "ETAT.COULE"
                     if retour == Etat.DANS_L_EAU:
                         print("Dans l'eau")
                         self.nombre_de_coups += 1
                     elif retour == Etat.TOUCHE:
                         print("Touché")
                         self.nombre_de_coups += 1
-                    else:
+                    else:  # "retour" vaut "ETAT.COULE"
                         print("Coulé")
                         self.nombre_de_coups += 1
+                    self.actualiser()
+                    if self.joueur_a_gagne():
+                        pass
+                        # TODO: continuer méthode
+
 

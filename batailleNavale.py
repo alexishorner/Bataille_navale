@@ -33,10 +33,11 @@ def creer_bateaux():
     bateaux.extend(creer_bateau(bateau.PorteAvions, NOMBRE_PORTES_AVIONS))
     return bateaux
 
-if __name__ == "__main__":
-    grille = Grille()
-    interface = Afficheur(grille)
-    bateaux = creer_bateaux()
-    grille.placer_bateaux(bateaux)
-    interface.dessiner_grille_console()
 
+if __name__ == "__main__":
+    bateaux = creer_bateaux()
+    grille = Grille(bateaux)
+    interface = Afficheur(grille)
+    grille.placer_bateaux()
+    interface.dessiner_grille_console()
+    interface.boucle_des_evenements()
