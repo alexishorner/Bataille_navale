@@ -169,7 +169,7 @@ class Case:
         """
         Méthode appelée lorsqu'un tir est dirigé vers cette case.
 
-        :return: booléen indiquant le succès de l'opération
+        :return: État de la case après l'opération ou "None" si la case a déjà reçu un tir ou "False" s'il y a eu une erreur
         """
         if self._bateau is not None:  # si un bateau est présent sur la case
             return self._bateau.recevoir_tir(self)
@@ -349,8 +349,15 @@ class Grille:
 
     def tirer_coord_ecran(self, coordonnees):
         pass
+        # TODO: terminer méthode
 
     def sont_coordonnees_index(self, coordonnees):
+        """
+        Détermine si "coordonnees" représente l'index d'une case de la grille.
+
+        :param coordonnees: coordonnées à tester
+        :return: Booléen valant "True" si "coordonnées" représente un index, "False" sinon.
+        """
         if type(coordonnees) is tuple or type(coordonnees) is list:  # Si les coordonnées sont une liste ou un tuple
             if len(coordonnees) == 2:
                 for coordonnee in coordonnees:
@@ -361,6 +368,15 @@ class Grille:
         return False  # Si une des conditions plus haut n'est pas satisfaite, on renvoie "False"
 
     def tirer(self, coordonnees):
+        """
+        Méthode permettant de tirer aux coordonnées "coordonnees".
+
+        Les coordonnées peuvent être sous deux formes différentes : index de la case ou coordonnées de la bataille
+        navale, par ex : "A6".
+        :param coordonnees: coordonnées où tirer
+        :return: État de la case après le tir si celui-ci a réussi, "None" si la case a déjà reçu un tir et "False"
+        s'il y a eu une erreur
+        """
         # On vérifie que les coordonnées sont valides et on les convertit en index
         if type(coordonnees) is str:  # Si les coordonnées sont présentées en coordonnées de la bataille navale
             coordonnees_index = self.coord_bataille_vers_index(coordonnees)
@@ -373,5 +389,4 @@ class Grille:
 
         case = self.cases[coordonnees_index[1]][coordonnees_index[0]]   # On accède la case visée, tout en faisant
                                                                         # attention à mettre la coordonnée y en premier
-        retour = case.recevoir_tir()
-        # TODO: finir méthode
+        return case.recevoir_tir()

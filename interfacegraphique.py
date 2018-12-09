@@ -34,7 +34,7 @@ class Tortue(turtle.Turtle):
         turtle.Turtle.__init__(self)
         self.hideturtle()  # cache la tortue
         self.screen.tracer(0, 0)  # rend le dessin instantané, mais l'écran doit être rafraîchit manuellement en appelant "self.screen.update()"
-        self.fillcolor(self.__class__.COULEUR)
+        self.fillcolor(self.COULEUR)
 
     def _dessiner_forme(self, chemin, ferme=True):
         """
@@ -92,6 +92,11 @@ class Afficheur:
         """
         self.grille = grille
         self.tortue = Tortue()
+        self.nombre_de_coups = 0
+
+    @staticmethod
+    def afficher_erreur():
+        print("Une erreur s'est produite.")
 
     def decimales(cls, nombre):
         """
@@ -180,4 +185,19 @@ class Afficheur:
         recommencer = True
         while recommencer:
             entree = recevoir_entree("\n>>> ") # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
+            retour = self.grille.tirer(entree)
+            if retour is None:
+                print("\nVous avez déjà tiré sur cette case.")
+            elif not retour and retour not in (Etat.DANS_L_EAU, Etat.TOUCHE, Etat.COULE):
+                self.afficher_erreur()
+            else:
+                if retour == Etat.DANS_L_EAU:
+                    print("Dans l'eau")
+                    self.nombre_de_coups += 1
+                elif retour == Etat.TOUCHE:
+                    print("Touché")
+                    self.nombre_de_coups += 1
+                else:
+                    print("Coulé")
+                    self.nombre_de_coups += 1
 
