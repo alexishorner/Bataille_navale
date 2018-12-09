@@ -10,14 +10,14 @@ from sys import platform
 import os
 
 
-def recevoir_entree(texte_a_afficher):
+def recevoir_entree(texte_a_afficher = ""):
     """
     Fonction équivalente à "raw_input()", mais compatible avec python 3
 
     :param texte_a_afficher: texte aà afficher avant de recevoir l'entrée de l'utilisateur
     :return: texte entré par l'utilisateur
     """
-    print(texte_a_afficher)
+    print(texte_a_afficher, end="")
     return stdin.readline().replace("\n", "")
 
 
@@ -96,7 +96,25 @@ class Afficheur:
 
     @staticmethod
     def afficher_erreur():
+        """
+        Indique à l'utilisateur qu'une erreur s'est produite.
+
+        :return: "None"
+        """
         print("Une erreur s'est produite.")
+
+    @staticmethod
+    def confirmer_quitter():
+        """
+        Demande la confirmation à l'utilisateur si il veut réellement quitter.
+
+        :return: Booléen indiquant si l'utilisateur veut quitter.
+        """
+        entree = recevoir_entree("\nÊtes-vous sûr(e) de vouloir quitter? o/n\n")
+        entree = entree.lower()
+        if entree in ("o", "oui"):
+            return True
+        return False
 
     def decimales(cls, nombre):
         """
@@ -108,6 +126,12 @@ class Afficheur:
         return int(math.floor(math.log10(nombre)+0.00001)+1)
 
     def dessiner_premiere_ligne_console(self):
+        """
+        Dessine la ligne de numérotation des colonnes de la grille.
+
+        Exemple: _A_B_C_D_E_F_G_H_I_J_
+        :return: "None"
+        """
         self.ajouter_espacement_avant()
         for index_x in range(self.grille.TAILLE):
             print("_" + string.ascii_uppercase[index_x], end="")
@@ -182,22 +206,31 @@ class Afficheur:
             _ = os.system("clear")
 
     def boucle_des_evenements(self):
+        """
+        Démarre la boucle des évènements.
+
+        Demande à l'utlisateur où il veut tirer et tire sur la case.
+        :return: "None"
+        """
         recommencer = True
         while recommencer:
-            entree = recevoir_entree("\n>>> ") # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
-            retour = self.grille.tirer(entree)
-            if retour is None:
-                print("\nVous avez déjà tiré sur cette case.")
-            elif not retour and retour not in (Etat.DANS_L_EAU, Etat.TOUCHE, Etat.COULE):
-                self.afficher_erreur()
+            entree = recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
+            if entree in ("quitter", "q"):
+                recommencer = not self.confirmer_quitter()
             else:
-                if retour == Etat.DANS_L_EAU:
-                    print("Dans l'eau")
-                    self.nombre_de_coups += 1
-                elif retour == Etat.TOUCHE:
-                    print("Touché")
-                    self.nombre_de_coups += 1
+                retour = self.grille.tirer(entree)
+                if retour is None:
+                    print("\nVous avez déjà tiré sur cette case.")
+                elif not retour and retour not in (Etat.DANS_L_EAU, Etat.TOUCHE, Etat.COULE):
+                    self.afficher_erreur()
                 else:
-                    print("Coulé")
-                    self.nombre_de_coups += 1
+                    if retour == Etat.DANS_L_EAU:
+                        print("Dans l'eau")
+                        self.nombre_de_coups += 1
+                    elif retour == Etat.TOUCHE:
+                        print("Touché")
+                        self.nombre_de_coups += 1
+                    else:
+                        print("Coulé")
+                        self.nombre_de_coups += 1
 
