@@ -68,7 +68,7 @@ class AbstractBateau:
         :return: booléen égal à "True" si le bateau est coulé, et "False" sinon
         """
         for case in self._cases:
-            if case.etat != Etat.TOUCHE or case.etat != Etat.COULE:
+            if case.etat not in (Etat.TOUCHE, Etat.COULE):
                 return False
         return True
 
@@ -84,7 +84,7 @@ class AbstractBateau:
                 if self.est_coule():
                     for chaque_case in self._cases:  # On utilise le nom "chaque_case", car "case" est déjà le nom d'un paramètre
                         chaque_case.etat = Etat.COULE  # si le bateau est coulé, on change l'état de chaque case
-                return case.Etat
+                return case.etat
             return None  # La case a déjà reçu un tir
         return False  # Il y a eu une erreur
 

@@ -213,10 +213,21 @@ class Grille:
         return element in array(liste).flat
 
     def vider(self):
+        """
+        Enlève tous les bateaux de la grille.
+
+        :return: "None"
+        """
         for ligne in self.cases:
             for case in ligne:
                 if case.bateau() is not None:
                     case.bateau().set_cases(None)  # enlève les bateaux un à un
+
+    def reinitialiser(self):
+        self.vider()  # Enlève tous les bateaux
+        for ligne in self.cases:
+            for case in ligne:
+                case.etat = Etat.VIDE  # Remet l'état de chaque case à zéro
 
     def cases_libres(self):
         """
@@ -307,8 +318,7 @@ class Grille:
     def coord_ecran_vers_index(coordonnees):
         pass
 
-    @staticmethod
-    def coord_bataille_vers_index(coordonnees):
+    def coord_bataille_vers_index(self, coordonnees):
         """
         Convertit les coordonnées de la bataille navale (ex : "A5" ou ("A", 5)) en coordonnées de la grille (ex: (1, 5)).
 
@@ -321,20 +331,20 @@ class Grille:
         copie_coordonnees = copie_coordonnees.replace(",", "")  # On enlève les virgules
         copie_coordonnees = copie_coordonnees.lower()  # On met tout en minuscules.
 
-        if len(copie_coordonnees) == 2: # On vérifie que la chaîne de caractères a la bonne longueur.
-            x = ""
-            lettres = ""
-            while copie_coordonnees[0].isalpha():
-                lettres += copie_coordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copie_coordonnees".
-                copie_coordonnees = copie_coordonnees[1:len(copie_coordonnees)]
-            for c in lettres:
-                x += str(string.ascii_letters(c).index())  # On transforme les lettres en nombres TODO: Augmenter sécurité
-            x = int(x)
+        x = ""
+        lettres = ""
+        while copie_coordonnees[0].isalpha():
+            lettres += copie_coordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copie_coordonnees".
+            copie_coordonnees = copie_coordonnees[1:len(copie_coordonnees)]
+        for c in lettres:
+            x += str(string.ascii_letters.index(c))  # On transforme les lettres en nombres TODO: Augmenter sécurité
+        x = int(x)
 
-            y = int(copie_coordonnees) - 1
-
+        y = int(copie_coordonnees) - 1
+        if x in range(self.TAILLE) and y in range(self.TAILLE):
             return x, y
-        return False
+        else:
+            return False
 
     @staticmethod
     def index_vers_coord_bataille(index):

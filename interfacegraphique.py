@@ -8,6 +8,7 @@ import string
 import math
 from sys import platform
 import os
+import random
 
 
 def recevoir_entree(texte_a_afficher=""):
@@ -121,6 +122,22 @@ class Afficheur:
         if entree in ("o", "oui"):
             return True
         return False
+
+    @staticmethod
+    def demander_rejouer():
+        """
+        Demande à l'utilisateur si il veut rejouer.
+
+        :return: Booléen indiquant si le joueur veut rejouer
+        """
+        while True:
+            entree = recevoir_entree("Voulez-vous rejouer? o/n ")
+            if entree.lower() in ("o", "oui"):
+                return True
+            elif entree.lower() in ("n", "non"):
+                return False
+            else:
+                print("Erreur, entrée invalide")
 
     def decimales(cls, nombre):
         """
@@ -237,23 +254,31 @@ class Afficheur:
                 recommencer = not self.confirmer_quitter()
             else:
                 retour = self.grille.tirer(entree)  # On tire sur la case et on enregistre le retour de la méthode
+
                 if retour is None:
                     print("\nVous avez déjà tiré sur cette case.")
-                elif not retour and retour not in (Etat.DANS_L_EAU, Etat.TOUCHE, Etat.COULE):
-                    self.afficher_erreur()
-                else:  # "retour" vaut soit "Etat.DANS_L_EAU", soit "ETAT.TOUCHE", soit "ETAT.COULE"
+                elif retour in (Etat.DANS_L_EAU, Etat.TOUCHE, Etat.COULE):
                     if retour == Etat.DANS_L_EAU:
                         print("Dans l'eau")
-                        self.nombre_de_coups += 1
                     elif retour == Etat.TOUCHE:
                         print("Touché")
-                        self.nombre_de_coups += 1
-                    else:  # "retour" vaut "ETAT.COULE"
+                    else:
                         print("Coulé")
-                        self.nombre_de_coups += 1
-                    self.actualiser()
-                    if self.joueur_a_gagne():
-                        pass
-                        # TODO: continuer méthode
+                    self.nombre_de_coups += 1
+                else:
+                    self.afficher_erreur()
+                self.actualiser()
+
+                if self.joueur_a_gagne():
+                    print("Vous avez gagné, bravo!")
+                    recommencer = self.demander_rejouer()
+                    if recommencer:
+                        self.grille.reinitialiser()
+                        self.grille.placer_bateaux()
+                        self.actualiser()
+
+
+
+
 
 
