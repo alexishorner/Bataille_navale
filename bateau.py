@@ -76,17 +76,17 @@ class AbstractBateau:
         """
         Méthode appelée lorsque le joueur tire sur une case appartenant au bateau.
 
-        :return: booléen informant si le tir a été effectué avec succès ou non
+        :return: Etat de la case après l'opération ou "None" si la case a déjà reçu un tir ou "False" si l'opération a échoué
         """
         if case in self._cases:  # si la case est une case du bateau
-            if not self.est_coule():  # si le bateau n'est pas coulé
+            if case.etat == Etat.BATEAU_INTACT:  # si la case n'a pas déjà été touchée
                 case.etat = Etat.TOUCHE  # le bateau est touché en cette case
                 if self.est_coule():
-                    for chaque_case in self._cases:
+                    for chaque_case in self._cases:  # On utilise le nom "chaque_case", car "case" est déjà le nom d'un paramètre
                         chaque_case.etat = Etat.COULE  # si le bateau est coulé, on change l'état de chaque case
-            return True
-        else:
-            return False
+                return case.Etat
+            return None  # La case a déjà reçu un tir
+        return False  # Il y a eu une erreur
 
 
 class Torpilleur(AbstractBateau):

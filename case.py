@@ -174,7 +174,8 @@ class Case:
         if self._bateau is not None:  # si un bateau est présent sur la case
             return self._bateau.recevoir_tir(self)
         else:
-            return False
+            self.etat = Etat.DANS_L_EAU
+            return self.etat
 
 
 class Grille:
@@ -311,25 +312,28 @@ class Grille:
         Convertit les coordonnées de la bataille navale (ex : "A5" ou ("A", 5)) en coordonnées de la grille (ex: (1, 5)).
 
         :param coordonnees: coordonnées de la bataille navale
-        :return: coordonnées équivalentes sur la grille
+        :return: coordonnées équivalentes sur la grille ou "False" si l'opération a échoué
         """
         copie_coordonnees = "".join(coordonnees)  # On assure que "copieCoordonnes" est une chaîne de caractères et non une liste ou un tuple
         copie_coordonnees = copie_coordonnees.replace(" ", "")  # On enlève les espaces.
         copie_coordonnees = copie_coordonnees.replace(".", "")  # On enlève les points
+        copie_coordonnees = copie_coordonnees.replace(",", "")  # On enlève les virgules
         copie_coordonnees = copie_coordonnees.lower()  # On met tout en minuscules.
 
-        x = ""
-        lettres = ""
-        while copie_coordonnees[0].isalpha():
-            lettres += copie_coordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copie_coordonnees".
-            copie_coordonnees = copie_coordonnees[1:len(copie_coordonnees)]
-        for c in lettres:
-            x += str(string.ascii_letters(c).index())  # On transforme les lettres en nombres TODO: Augmenter sécurité
-        x = int(x)
+        if len(copie_coordonnees) == 2: # On vérifie que la chaîne de caractères a la bonne longueur.
+            x = ""
+            lettres = ""
+            while copie_coordonnees[0].isalpha():
+                lettres += copie_coordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copie_coordonnees".
+                copie_coordonnees = copie_coordonnees[1:len(copie_coordonnees)]
+            for c in lettres:
+                x += str(string.ascii_letters(c).index())  # On transforme les lettres en nombres TODO: Augmenter sécurité
+            x = int(x)
 
-        y = int(copie_coordonnees) - 1
+            y = int(copie_coordonnees) - 1
 
-        return x, y
+            return x, y
+        return False
 
     @staticmethod
     def index_vers_coord_bataille(index):
@@ -342,3 +346,32 @@ class Grille:
         lettre = string.ascii_uppercase[index[Coord.x]]  # On convertit la coordonnée x en lettre majuscule
         nombre = index[Coord.y] + 1
         return lettre + str(nombre)
+
+    def tirer_coord_ecran(self, coordonnees):
+        pass
+
+    def sont_coordonnees_index(self, coordonnees):
+        if type(coordonnees) is tuple or type(coordonnees) is list:  # Si les coordonnées sont une liste ou un tuple
+            if len(coordonnees) == 2:
+                for coordonnee in coordonnees:
+                    if (type(coordonnee) is not int and type(coordonnees) is not float # Si le type des coordonnées n'est pas un nombre
+                    or coordonnee not in range(self.TAILLE)):  # ou si les coordonnées n'ont pas la bonne valeur
+                        return False
+                    return True
+        return False  # Si une des conditions plus haut n'est pas satisfaite, on renvoie "False"
+
+    def tirer(self, coordonnees):
+        # On vérifie que les coordonnées sont valides et on les convertit en index
+        if type(coordonnees) is str:  # Si les coordonnées sont présentées en coordonnées de la bataille navale
+            coordonnees_index = self.coord_bataille_vers_index(coordonnees)
+        elif self.sont_coordonnees_index(coordonnees):
+            coordonnees_index = coordonnees
+        else:
+            return False
+        if not coordonnees_index:
+            return False
+
+        case = self.cases[coordonnees_index[1]][coordonnees_index[0]]   # On accède la case visée, tout en faisant
+                                                                        # attention à mettre la coordonnée y en premier
+        retour = case.recevoir_tir()
+        # TODO: finir méthode

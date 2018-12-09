@@ -1,12 +1,24 @@
 # coding: utf-8
 # Attention les noms de variables ne contiennent pas d'accent, ce qui peut changer leur signification (par ex : côté devient cote)
-from __future__ import print_function  # Permet d'utiliser la fonction print de python 3
+from __future__ import print_function  # Permet d'utiliser la fonction print de python 3, qui a le paramètre "end"
+from sys import stdin  # Sert à recevoir des entrées de l'utilisateur en restant compatible avec python 3
 from case import Etat
 import turtle
 import string
 import math
 from sys import platform
 import os
+
+
+def recevoir_entree(texte_a_afficher):
+    """
+    Fonction équivalente à "raw_input()", mais compatible avec python 3
+
+    :param texte_a_afficher: texte aà afficher avant de recevoir l'entrée de l'utilisateur
+    :return: texte entré par l'utilisateur
+    """
+    print(texte_a_afficher)
+    return stdin.readline().replace("\n", "")
 
 
 class Tortue(turtle.Turtle):
@@ -57,6 +69,7 @@ class Tortue(turtle.Turtle):
     def _dessiner_etat(self, case):
         """
         Dessine l'état de la case.
+
         :param case: case dont il faut dessiner l'état
         :return: "None"
         """
@@ -127,6 +140,7 @@ class Afficheur:
     def dessiner_case_console(self, index_y, index_x):
         """
         Dessine une case de la grille dans la console.
+
         :param index_y: index de la ligne
         :param index_x: index de la colonne
         :return: "None"
@@ -139,7 +153,8 @@ class Afficheur:
 
     def ajouter_espacement_avant(self, nombre=None):
         """
-        Ajoute un espacement avant la grille pour aligner les nombres sur la droite
+        Ajoute un espacement avant la grille pour aligner les nombres sur la droite.
+
         :param nombre: nombre qui doit être aligné
         :return: "None"
         """
@@ -153,6 +168,7 @@ class Afficheur:
     def _effacer_tout_console(self):
         """
         Fonction multi-plateforme permettant d'effacer le contenu de la console.
+
         :return: "None"
         """
         if platform == "win32":  # La commande dépend du système d'exploitation
@@ -163,5 +179,5 @@ class Afficheur:
     def boucle_des_evenements(self):
         recommencer = True
         while recommencer:
-            entree = raw_input("\n>>> ")
-            # TODO: terminer méthode
+            entree = recevoir_entree("\n>>> ") # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
+
