@@ -378,7 +378,7 @@ class Grille:
                     return True
         return False  # Si une des conditions plus haut n'est pas satisfaite, on renvoie "False"
 
-    def tirer(self, coordonnees):
+    def tirer_console(self, coordonnees):
         """
         Méthode permettant de tirer aux coordonnées "coordonnees".
 

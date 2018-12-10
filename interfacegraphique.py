@@ -2,24 +2,35 @@
 # Attention les noms de variables ne contiennent pas d'accent, ce qui peut changer leur signification (par ex : côté devient cote)
 from __future__ import print_function  # Permet d'utiliser la fonction print de python 3, qui a le paramètre "end"
 from sys import stdin  # Sert à recevoir des entrées de l'utilisateur en restant compatible avec python 3
-from case import Etat
+from case import Etat, Case, Grille
 import turtle
 import string
 import math
 from sys import platform
 import os
+from enum import IntEnum, unique
 import random
 
 
-def recevoir_entree(texte_a_afficher=""):
+def chaine_nettoyee(chaine):
     """
-    Fonction équivalente à "raw_input()", mais compatible avec python 3
+    Renvoie une chaîne de caractères identique à "chaine", mais en minuscules et sans espaces
 
-    :param texte_a_afficher: texte aà afficher avant de recevoir l'entrée de l'utilisateur
-    :return: texte entré par l'utilisateur
+    :param chaine: Chaîne de caractères à nettoyer
+    :return: Chaîne nettoyée
     """
-    print(texte_a_afficher, end="")
-    return stdin.readline().replace("\n", "")
+    return chaine.lower().replace(" ", "")
+
+
+@unique
+class Mode(IntEnum):
+    """
+    Énumération décrivant les différents modes d'affichage.
+
+    "CONSOLE" est l'affichage dans la console
+    "TORTUE" est l'affichage avec la tortue
+    """
+    CONSOLE, TORTUE = range(2)
 
 
 class Tortue(turtle.Turtle):
@@ -37,12 +48,15 @@ class Tortue(turtle.Turtle):
         self.screen.tracer(0, 0)  # rend le dessin instantané, mais l'écran doit être rafraîchit manuellement en appelant "self.screen.update()"
         self.fillcolor(self.COULEUR)
 
-    def sur_clic(self, x, y):
-        # TODO: vérifier que les coordonnées sont dans le bouton
-        self.screen.bye()
+    def initialiser(self, sur_clic):
+        """
+        Démarre l'affichage avec la tortue.
 
-    def attendre(self):
-        self.screen.onclick(self.sur_clic)
+        :param sur_clic: fonction à appeler lorsque la fenêtre est cliquée
+        :return: "None"
+        """
+        self.screen.onclick(sur_clic)
+        turtle.mainloop()
 
     def _dessiner_forme(self, chemin, ferme=True):
         """
@@ -87,14 +101,30 @@ class Tortue(turtle.Turtle):
         self._dessiner_etat(case)
 
     def dessiner_grille(self, grille):
+        """
+        Dessine la grille.
+
+        :param grille: grille à dessiner
+        :return: "None"
+        """
         self.clear()
         for ligne in grille:
             for case in ligne:
                 self.dessiner_case(case)
         self.screen.update()
-        # TODO: dessiner bouton retour à la console
-        # self.attendre()
-        # turtle.mainloop()
+
+    def afficher_message(self, message, position):
+        """
+        Affiche un message à une certaine position.
+
+        :param message: message à afficher
+        :param position: endroit où afficher le message
+        :return: "None"
+        """
+        self.up()
+        self.goto(position)
+        self.down()
+        self.write(message)
 
 
 class Afficheur:
@@ -108,52 +138,96 @@ class Afficheur:
         :param grille: grille de jeu à afficher
         """
         self.grille = grille
-        self.tortue = Tortue()
+        self._mode = Mode.CONSOLE
+        self.tortue = None
         self.nombre_de_coups = 0
 
-    def actualiser(self):
-        self.dessiner_grille_console()
-        self.tortue.dessiner_grille(self.grille.cases)
+    def afficher(self, message, fin="\n"):
+        """
+        Affiche un message.
 
-    @staticmethod
-    def afficher_erreur():
+        :param message: message à afficher
+        :param fin: caractère à placer après le message
+        :return:
+        """
+        if self._mode == Mode.CONSOLE:
+            print(message, end=fin)
+        else:
+            self.tortue.afficher_message(message+fin, (0, self.grille.TAILLE*Case.TAILLE))
+
+    def recevoir_entree(self, texte_a_afficher=""):
+        """
+        Fonction équivalente à "raw_input()", mais compatible avec python 3 et avec la tortue
+
+        :param texte_a_afficher: texte aà afficher avant de recevoir l'entrée de l'utilisateur
+        :return: texte entré par l'utilisateur
+        """
+        print(texte_a_afficher, end="")
+        return stdin.readline().replace("\n", "")
+        # TODO: éventuellement adapter à la tortue
+
+    def confirmer_question(self, question):
+        """
+        Confirme si l'utilisateur répond oui à une question.
+
+        :param question: question posée
+        :return: Booléen indiquant si l'utilisateur a répondu par l'affirmative
+        """
+        entree = self.recevoir_entree(question)
+        entree = chaine_nettoyee(entree)
+        if entree in ("oui", "o"):
+            return True
+        return False
+        # TODO: adapter à la tortue
+            # TODO: Possibilités: 1. ajouter champ avec Tkinter 2. créer boutons avec tortue
+
+    def afficher_erreur(self):
         """
         Indique à l'utilisateur qu'une erreur s'est produite.
 
         :return: "None"
         """
-        print("Une erreur s'est produite.")
+        self.afficher("Une erreur s'est produite.")
 
-    @staticmethod
-    def confirmer_quitter():
+    def confirmer_quitter(self):
         """
         Demande la confirmation à l'utilisateur si il veut réellement quitter.
 
         :return: Booléen indiquant si l'utilisateur veut quitter.
         """
-        entree = recevoir_entree("\nÊtes-vous sûr(e) de vouloir quitter? o/n\n")
-        entree = entree.lower()
-        if entree in ("o", "oui"):
-            return True
+        return self.confirmer_question("\nÊtes-vous sûr(e) de vouloir quitter? o/n\n")
+        # TODO: éventuellement adapter à la tortue
+
+    def confirmer_tortue(self):
+        """
+        Confirme si l'utilisateur veut utiliser la tortue ou non.
+
+        Si la tortue est déjà le mode de dessin, cette fonction affiche une erreur.
+        :return: Booléen indiquant si l'utilisateur veut utiliser la tortue
+        """
+        if self._mode == Mode.CONSOLE:
+            return self.confirmer_question("\nÊtes-vous sûr(e) de vouloir activer l'affichage avec la tortue?\n"
+                                           "Vous ne pourrez plus revenir à l'affichage dans le terminal. o/n")
+        self.afficher("La tortue est déjà le mode de dessin.")
         return False
 
-    @staticmethod
-    def demander_rejouer():
+    def demander_rejouer(self):
         """
         Demande à l'utilisateur si il veut rejouer.
 
         :return: Booléen indiquant si le joueur veut rejouer
         """
         while True:
-            entree = recevoir_entree("Voulez-vous rejouer? o/n ")
+            entree = self.recevoir_entree("Voulez-vous rejouer? o/n ")
             if entree.lower() in ("o", "oui"):
                 return True
             elif entree.lower() in ("n", "non"):
                 return False
             else:
-                print("Erreur, entrée invalide")
+                self.afficher("Erreur, entrée invalide")
 
-    def decimales(cls, nombre):
+    @staticmethod
+    def decimales(nombre):
         """
         Nombre de décimales d'un nombre.
 
@@ -161,6 +235,27 @@ class Afficheur:
         :return: nombre de décimales
         """
         return int(math.floor(math.log10(nombre)+0.00001)+1)
+
+    def actualiser(self):
+        """
+        Actualise l'écran.
+
+        :return: "None"
+        """
+        if self._mode == Mode.CONSOLE:
+            self.dessiner_grille_console()
+        else:
+            self.tortue.dessiner_grille(self.grille)
+
+    def changer_vers_tortue(self):
+        """
+        Change le mode d'affichage pour utiliser la tortue.
+
+        :return: "None"
+        """
+        self._mode = Mode.TORTUE
+        self.tortue = Tortue()
+        self.tortue.initialiser(self.avancer_d_un_tour)
 
     def ajouter_espacement_avant(self, nombre=None):
         """
@@ -254,6 +349,77 @@ class Afficheur:
                 return False
         return True
 
+    def tirer(self, coordonnees):
+        """
+        Tire sur une case en utilisant la fonction correspondant au mode
+        :param coordonnees: coordonnées où tirer
+        :return:  État de la case après le tir si celui-ci a réussi, "None" si la case a déjà reçu un tir et "False"
+        s'il y a eu une erreur
+        """
+        if self._mode == Mode.CONSOLE:
+            return self.grille.tirer_console(coordonnees)
+        return self.grille.tirer_coord_ecran(coordonnees)
+
+    def afficher_retour_tir(self, retour):
+        """
+        Affiche un message à l'écran en fonction du retour de la fonction de tir
+
+        :param retour: retour de la fonction de tir
+        :return: "None"
+        """
+        if retour is None:
+            self.afficher("\nVous avez déjà tiré sur cette case.")
+        elif retour in (Etat.DANS_L_EAU, Etat.TOUCHE, Etat.COULE):
+            if retour == Etat.DANS_L_EAU:
+                self.afficher("Dans l'eau")
+            elif retour == Etat.TOUCHE:
+                self.afficher("Touché")
+            else:
+                self.afficher("Coulé")
+            self.nombre_de_coups += 1
+        else:
+            self.afficher_erreur()
+
+    def avancer_d_un_tour(self, x=None, y=None, entree=None):
+        """
+        Fonction permettant au jeu d'avancer d'un tour. Elle a été conçue pour fonctionner avec la tortue et la console.
+
+        Elle peut être passée à "turtle.Turtle.screen.onclick", car elle commence par les arguments "x" et "y"
+        :param x: position x du clic sur l'écran quand la fonction est passée à "turtle.Turtle.screen.onclick"
+        :param y: position y du clic sur l'écran quand la fonction est passée à "turtle.Turtle.screen.onclick"
+        :param entree: entrée de l'utilisateur dans la console
+        :return: booléen indiquant si le jeu doit continuer
+        """
+        entree_convertie = entree  # On crée une variable globale à la fonction pour avoir la même variable pour
+                                   # l'entrée avec la tortue et la console
+        if x is not None and y is not None:
+            entree_convertie = self.grille.coord_ecran_vers_index(x, y)  # On convertit les coordonnées pour pouvoir les
+                                                                         # utiliser avec d'autres méthodes
+        continuer = True
+        if chaine_nettoyee(entree) in ("quitter", "q"):  # Si l'utilisateur veut quitter
+            continuer = not self.confirmer_quitter()
+        elif chaine_nettoyee(entree) in ("tortue", "t"):
+            if self.confirmer_tortue():  # Si l'utilisateur veut utiliser la tortue
+                self.changer_vers_tortue()
+                # Le code ne dépasse jamais ce point, car on entre dans la boucle des évènements de la tortue
+        else:
+            retour = self.grille.tirer_console(entree_convertie)  # On tire sur la case et on enregistre le retour de la méthode
+            self.afficher_retour_tir(retour)
+            self.actualiser()
+
+            if self.joueur_a_gagne():
+                print("Vous avez gagné, bravo!")
+                rejouer = self.demander_rejouer()
+                continuer = rejouer
+                if rejouer:
+                    self.grille.reinitialiser()
+                    self.grille.placer_bateaux()
+                    self.actualiser()
+        return continuer
+
+
+
+
     def boucle_des_evenements(self):
         """
         Démarre la boucle des évènements.
@@ -262,35 +428,10 @@ class Afficheur:
         :return: "None"
         """
         self.actualiser()
-        recommencer = True
-        while recommencer:
-            entree = recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
-            if entree in ("quitter", "q"):
-                recommencer = not self.confirmer_quitter()
-            else:
-                retour = self.grille.tirer(entree)  # On tire sur la case et on enregistre le retour de la méthode
-
-                if retour is None:
-                    print("\nVous avez déjà tiré sur cette case.")
-                elif retour in (Etat.DANS_L_EAU, Etat.TOUCHE, Etat.COULE):
-                    if retour == Etat.DANS_L_EAU:
-                        print("Dans l'eau")
-                    elif retour == Etat.TOUCHE:
-                        print("Touché")
-                    else:
-                        print("Coulé")
-                    self.nombre_de_coups += 1
-                else:
-                    self.afficher_erreur()
-                self.actualiser()
-
-                if self.joueur_a_gagne():
-                    print("Vous avez gagné, bravo!")
-                    recommencer = self.demander_rejouer()
-                    if recommencer:
-                        self.grille.reinitialiser()
-                        self.grille.placer_bateaux()
-                        self.actualiser()
+        continuer = True
+        while continuer:
+            entree = self.recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
+            continuer = self.avancer_d_un_tour(entree=entree)
 
 
 
