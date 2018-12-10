@@ -39,5 +39,4 @@ if __name__ == "__main__":
     grille = Grille(bateaux)
     interface = Afficheur(grille)
     grille.placer_bateaux()
-    interface.dessiner_grille_console()
     interface.boucle_des_evenements()

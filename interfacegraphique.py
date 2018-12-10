@@ -37,6 +37,13 @@ class Tortue(turtle.Turtle):
         self.screen.tracer(0, 0)  # rend le dessin instantané, mais l'écran doit être rafraîchit manuellement en appelant "self.screen.update()"
         self.fillcolor(self.COULEUR)
 
+    def sur_clic(self, x, y):
+        # TODO: vérifier que les coordonnées sont dans le bouton
+        self.screen.bye()
+
+    def attendre(self):
+        self.screen.onclick(self.sur_clic)
+
     def _dessiner_forme(self, chemin, ferme=True):
         """
         Dessine une forme à l'écran.
@@ -55,18 +62,6 @@ class Tortue(turtle.Turtle):
             self.goto(chemin[0])
         self.end_fill()
 
-    def dessiner_case(self, case):
-        """
-        Affiche une case à l'écran.
-
-        Le dessin au centre de la case dépend de son état.
-        :param case: case à dessiner
-        :return: "None"
-        """
-        self._dessiner_forme(case.carre())
-        self._dessiner_etat(case)
-        self.screen.update()  # on actualise l'écran pour afficher les changements
-
     def _dessiner_etat(self, case):
         """
         Dessine l'état de la case.
@@ -79,6 +74,27 @@ class Tortue(turtle.Turtle):
             self.goto(case.milieu())
             self.down()
             self.write(case.caractere_etat())
+
+    def dessiner_case(self, case):
+        """
+        Affiche une case à l'écran.
+
+        Le dessin au centre de la case dépend de son état.
+        :param case: case à dessiner
+        :return: "None"
+        """
+        self._dessiner_forme(case.carre())
+        self._dessiner_etat(case)
+
+    def dessiner_grille(self, grille):
+        self.clear()
+        for ligne in grille:
+            for case in ligne:
+                self.dessiner_case(case)
+        self.screen.update()
+        # TODO: dessiner bouton retour à la console
+        # self.attendre()
+        # turtle.mainloop()
 
 
 class Afficheur:
@@ -95,11 +111,9 @@ class Afficheur:
         self.tortue = Tortue()
         self.nombre_de_coups = 0
 
-
-
     def actualiser(self):
         self.dessiner_grille_console()
-        self.tortue.screen.update()
+        self.tortue.dessiner_grille(self.grille.cases)
 
     @staticmethod
     def afficher_erreur():
@@ -148,6 +162,20 @@ class Afficheur:
         """
         return int(math.floor(math.log10(nombre)+0.00001)+1)
 
+    def ajouter_espacement_avant(self, nombre=None):
+        """
+        Ajoute un espacement avant la grille pour aligner les nombres sur la droite.
+
+        :param nombre: nombre qui doit être aligné
+        :return: "None"
+        """
+        espacement_total = self.decimales(self.grille.TAILLE)
+        if nombre is None:
+            espacement = espacement_total
+        else:
+            espacement = espacement_total - self.decimales(nombre)
+        print(" "*espacement, end="")  # Ajoute un espacement pour aligner les nombres à droite
+
     def dessiner_premiere_ligne_console(self):
         """
         Dessine la ligne de numérotation des colonnes de la grille.
@@ -159,6 +187,20 @@ class Afficheur:
         for index_x in range(self.grille.TAILLE):
             print("_" + string.ascii_uppercase[index_x], end="")
         print("_\n", end="")
+
+    def dessiner_case_console(self, index_y, index_x):
+        """
+        Dessine une case de la grille dans la console.
+
+        :param index_y: index de la ligne
+        :param index_x: index de la colonne
+        :return: "None"
+        """
+        case = self.grille.cases[index_y][index_x]
+        print("|", end="")
+        print(case.caractere_etat(), end="")
+        if index_x == self.grille.TAILLE-1:
+            print("|\n", end="")
 
     def dessiner_grille_console(self):
         """
@@ -188,34 +230,6 @@ class Afficheur:
                     print(str(index_y+1), end="")
 
                 self.dessiner_case_console(index_y, index_x)
-
-    def dessiner_case_console(self, index_y, index_x):
-        """
-        Dessine une case de la grille dans la console.
-
-        :param index_y: index de la ligne
-        :param index_x: index de la colonne
-        :return: "None"
-        """
-        case = self.grille.cases[index_y][index_x]
-        print("|", end="")
-        print(case.caractere_etat(), end="")
-        if index_x == self.grille.TAILLE-1:
-            print("|\n", end="")
-
-    def ajouter_espacement_avant(self, nombre=None):
-        """
-        Ajoute un espacement avant la grille pour aligner les nombres sur la droite.
-
-        :param nombre: nombre qui doit être aligné
-        :return: "None"
-        """
-        espacement_total = self.decimales(self.grille.TAILLE)
-        if nombre is None:
-            espacement = espacement_total
-        else:
-            espacement = espacement_total - self.decimales(nombre)
-        print(" "*espacement, end="")  # Ajoute un espacement pour aligner les nombres à droite
 
     def _effacer_tout_console(self):
         """
@@ -247,6 +261,7 @@ class Afficheur:
         Demande à l'utlisateur où il veut tirer et tire sur la case.
         :return: "None"
         """
+        self.actualiser()
         recommencer = True
         while recommencer:
             entree = recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
