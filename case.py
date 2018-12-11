@@ -308,15 +308,17 @@ class Grille:
         :return: réussite de l'opération
         """
         bateaux_a_placer = trier_bateaux_par_taille(self.bateaux, True)  # On trie les bateaux dans l'ordre décroissant pour
-                                                                    # placer les plus grands en premier
+                                                                         # placer les plus grands en premier
         for bateau in bateaux_a_placer:
             cases_possibles = self.groupes_de_cases_libres(bateau.TAILLE)  # TODO: attention bugs possibles si aucun groupe n'est trouvé
             bateau.set_cases(random.choice(cases_possibles))  # Sélectionne un groupe de cases aléatoire pour les cases du bateau
         return True
 
-    @staticmethod
-    def coord_ecran_vers_index(coordonnees):
-        pass
+    def coord_ecran_vers_index(self, coordonnees):
+        origine = self.cases[0][0].position
+        dist_origine_x = coordonnees[Coord.x] - origine[Coord.x]
+        dist_origine_y = coordonnees[Coord.y] - origine[Coord.y]
+        # TODO: continuer méthode
 
     def coord_bataille_vers_index(self, coordonnees):
         """
