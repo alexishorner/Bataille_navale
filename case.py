@@ -174,8 +174,10 @@ class Case:
         if self._bateau is not None:  # si un bateau est présent sur la case
             return self._bateau.recevoir_tir(self)
         else:
-            self.etat = Etat.DANS_L_EAU
-            return self.etat
+            if self.etat != Etat.DANS_L_EAU:
+                self.etat = Etat.DANS_L_EAU
+                return self.etat
+            return None
 
 
 class Grille:
@@ -195,7 +197,7 @@ class Grille:
             self.TAILLE = self.__class__.TAILLE_MAX
         self.cases = []
         decalage_x = -self.TAILLE*Case.TAILLE/2.0  # décalage permettant de centrer la grille
-        decalage_y = (self.TAILLE-1)*Case.TAILLE/2.0  # on décale moins, car sinon la grille est trop haute
+        decalage_y = (self.TAILLE-4)*Case.TAILLE/2.0  # on décale moins, car sinon la grille est trop haute
         for i in range(self.TAILLE):
             ligne = []
             for j in range(self.TAILLE):
@@ -230,6 +232,7 @@ class Grille:
         for ligne in self.cases:
             for case in ligne:
                 case.etat = Etat.VIDE  # Remet l'état de chaque case à zéro
+        pass
 
     def cases_libres(self):
         """

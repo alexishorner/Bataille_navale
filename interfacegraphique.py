@@ -22,6 +22,16 @@ def chaine_nettoyee(chaine):
     return chaine.lower().replace(" ", "")
 
 
+def decimales(nombre):
+        """
+        Nombre de décimales d'un nombre.
+
+        :param nombre: nombre dont on veut savoir les décimales
+        :return: nombre de décimales
+        """
+        return int(math.floor(math.log10(nombre)+0.00001)+1)
+
+
 @unique
 class Mode(IntEnum):
     """
@@ -66,11 +76,12 @@ class Tortue(turtle.Turtle):
         else:
             return "white"
 
-    def afficher_message(self, message, position, police=("Arial", 8, "normal")):
+    def afficher_message(self, message, position, alignement="left", police=("Arial", 8, "normal")):
         """
         Affiche un message à une certaine position.
 
         :param message: message à afficher
+        :param alignement: alignement du texte
         :param position: endroit où afficher le message
         :param police: police à utiliser pour écrire
         :return: "None"
@@ -78,14 +89,20 @@ class Tortue(turtle.Turtle):
         self.up()
         self.goto(position)
         self.down()
-        self.write(message, font=police)
+        self.write(message, align=alignement, font=police)
 
     def dessiner_graduations(self, origine, cote_grille):
-        x, y = origine
+        x_0, y_0= origine
+        decimales_max = decimales(cote_grille)
         cote_case = Case.TAILLE
+        taille_police = int(Case.TAILLE/10.0+8)
         for i in range(cote_grille):
-            self.afficher_message(string.ascii_uppercase[i], (x+i*cote_case+cote_case/2.0, y+cote_case), police=("Arial", 12, "bold"))
-            self.afficher_message(str(i+1), (x-cote_case, y-i*cote_case-cote_case/2.0), police=("Arial", 12, "bold"))
+            x = x_0+i*cote_case+cote_case/2.0
+            y = y_0+cote_case+decimales_max*taille_police/2.0
+            self.afficher_message(string.ascii_uppercase[i], (x, y), alignement="center", police=("Arial", taille_police, "bold"))
+            x = x_0-decimales_max*taille_police/2.0
+            y = y_0-(i-1)*cote_case-cote_case/2.0-taille_police
+            self.afficher_message(str(i+1), (x, y), alignement="right", police=("Arial", taille_police, "bold"))
 
     def dessiner_case(self, case):
         """
@@ -124,6 +141,7 @@ class Afficheur:
     """
     Cette classe permet de dessiner les objets à l'écran. Elle utilise un objet "Tortue" ou la console pour dessiner à l'écran.
     """
+    NOMBRE_DE_COUPS_MAX = 30
     def __init__(self, grille):
         """
         constructeur de la classe "Stylo"
@@ -132,7 +150,24 @@ class Afficheur:
         """
         self.grille = grille
         self.tortue = Tortue()
-        self.nombre_de_coups = 0
+        self._nombre_de_coups = 0
+
+    def coups_restants(self):
+        return self.NOMBRE_DE_COUPS_MAX-self._nombre_de_coups
+
+    def rejouer(self):
+        self.grille.reinitialiser()
+        self.grille.placer_bateaux()
+        self.actualiser()
+        self._nombre_de_coups = 0
+
+    def sur_coup_joue(self):
+        self._nombre_de_coups += 1
+
+    def joueur_a_perdu(self):
+        if self.coups_restants() <= 0:
+            return True
+        return False
 
     def afficher(self, message, fin="\n"):
         """
@@ -199,16 +234,6 @@ class Afficheur:
             else:
                 self.afficher("Erreur, entrée invalide")
 
-    @staticmethod
-    def decimales(nombre):
-        """
-        Nombre de décimales d'un nombre.
-
-        :param nombre: nombre dont on veut savoir les décimales
-        :return: nombre de décimales
-        """
-        return int(math.floor(math.log10(nombre)+0.00001)+1)
-
     def actualiser(self):
         """
         Actualise l'écran.
@@ -217,6 +242,7 @@ class Afficheur:
         """
         self.dessiner_grille_console()
         self.tortue.dessiner_grille(self.grille.cases)
+        self.afficher_coups_restants()
 
     def ajouter_espacement_avant(self, nombre=None):
         """
@@ -225,11 +251,11 @@ class Afficheur:
         :param nombre: nombre qui doit être aligné
         :return: "None"
         """
-        espacement_total = self.decimales(self.grille.TAILLE)
+        espacement_total = decimales(self.grille.TAILLE)
         if nombre is None:
             espacement = espacement_total
         else:
-            espacement = espacement_total - self.decimales(nombre)
+            espacement = espacement_total - decimales(nombre)
         print(" "*espacement, end="")  # Ajoute un espacement pour aligner les nombres à droite
 
     def dessiner_premiere_ligne_console(self):
@@ -299,6 +325,9 @@ class Afficheur:
         else:
             _ = os.system("clear")  # Idem
 
+    def afficher_coups_restants(self):
+        print("Coups restants : " + str(self.coups_restants()))
+
     def joueur_a_gagne(self):
         """
         Détermine si le joueur a gagné
@@ -335,11 +364,11 @@ class Afficheur:
                 self.afficher("Touché")
             else:
                 self.afficher("Coulé")
-            self.nombre_de_coups += 1
+            self.sur_coup_joue()
         else:
             self.afficher_erreur()
 
-    def avancer_d_un_tour(self, entree=None):
+    def avancer_d_un_tour(self, entree):
         """
         Fonction permettant au jeu d'avancer d'un tour.
 
@@ -360,9 +389,11 @@ class Afficheur:
                 rejouer = self.demander_rejouer()
                 continuer = rejouer
                 if rejouer:
-                    self.grille.reinitialiser()
-                    self.grille.placer_bateaux()
-                    self.actualiser()
+                    self.rejouer()
+            elif self.joueur_a_perdu():
+                print("Vous avez perdu!")
+                if self.demander_rejouer():
+                    self.rejouer()
         return continuer
 
 
@@ -379,7 +410,9 @@ class Afficheur:
         continuer = True
         while continuer:
             entree = self.recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
-            continuer = self.avancer_d_un_tour(entree=entree)
+            #entree = string.ascii_uppercase[random.randint(0, self.grille.TAILLE)] + str(random.randint(0, self.grille.TAILLE))
+            # TODO: enlever ligne de test
+            continuer = self.avancer_d_un_tour(entree)
 
 
 

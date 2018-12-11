@@ -41,6 +41,7 @@ class AbstractBateau:
         if not cases:  # Si "cases" est vide ou vaut "None"
             for case in self._cases:
                 case.set_bateau(None)
+            self._cases = []
         elif len(cases) == self.TAILLE and Case.sont_alignees(cases) and Case.sont_adjacentes(cases):
             # Le "self.__class__.TAILLE" permet d'accéder à la taille du bateau,
             # y compris avec les classes héritant de "AbstractBateau".
