@@ -37,7 +37,8 @@ class Tortue(turtle.Turtle):
     """
     Cette classe permet de customiser la tortue fournie par le module "turtle".
     """
-    COULEUR = "white"  # couleur de l'intértieur des cases
+    COULEUR_DEFAUT = "white"  # couleur de l'intértieur des cases
+
 
     def __init__(self):
         """
@@ -46,85 +47,77 @@ class Tortue(turtle.Turtle):
         turtle.Turtle.__init__(self)
         self.hideturtle()  # cache la tortue
         self.screen.tracer(0, 0)  # rend le dessin instantané, mais l'écran doit être rafraîchit manuellement en appelant "self.screen.update()"
-        self.fillcolor(self.COULEUR)
+        self.fillcolor(self.couleur_case(Etat.VIDE))
 
-    def initialiser(self, sur_clic):
+    @staticmethod
+    def couleur_case(etat):
         """
-        Démarre l'affichage avec la tortue.
+        Retourne la couleur correspondant à l'état de la case.
 
-        :param sur_clic: fonction à appeler lorsque la fenêtre est cliquée
-        :return: "None"
+        :param etat: état de la case à dessiner
+        :return: couleur correspondant à l'état de la case
         """
-        self.screen.onclick(sur_clic)
-        turtle.mainloop()
+        if etat == Etat.DANS_L_EAU:
+            return "blue"
+        elif etat == Etat.TOUCHE:
+            return "orange"
+        elif etat == Etat.COULE:
+            return "red"
+        else:
+            return "white"
 
-    def _dessiner_forme(self, chemin, ferme=True):
-        """
-        Dessine une forme à l'écran.
-
-        :param chemin: liste de points décrivant le chemin suivit par le stylo
-        :param ferme: booléen indiquant si le style doit fermer la forme en reliant le premier et dernier point.
-        :return: "None"
-        """
-        self.up()
-        self.goto(chemin[0])
-        self.down()
-        self.begin_fill()
-        for i in range(1, len(chemin)):  # le stylo est déjà à "chemin[0]", donc on commence à 1
-            self.goto(chemin[i])
-        if ferme:
-            self.goto(chemin[0])
-        self.end_fill()
-
-    def _dessiner_etat(self, case):
-        """
-        Dessine l'état de la case.
-
-        :param case: case dont il faut dessiner l'état
-        :return: "None"
-        """
-        if case.etat != Etat.VIDE and case.etat != Etat.BATEAU_INTACT:
-            self.up()
-            self.goto(case.milieu())
-            self.down()
-            self.write(case.caractere_etat())
-
-    def dessiner_case(self, case):
-        """
-        Affiche une case à l'écran.
-
-        Le dessin au centre de la case dépend de son état.
-        :param case: case à dessiner
-        :return: "None"
-        """
-        self._dessiner_forme(case.carre())
-        self._dessiner_etat(case)
-
-    def dessiner_grille(self, grille):
-        """
-        Dessine la grille.
-
-        :param grille: grille à dessiner
-        :return: "None"
-        """
-        self.clear()
-        for ligne in grille:
-            for case in ligne:
-                self.dessiner_case(case)
-        self.screen.update()
-
-    def afficher_message(self, message, position):
+    def afficher_message(self, message, position, police=("Arial", 8, "normal")):
         """
         Affiche un message à une certaine position.
 
         :param message: message à afficher
         :param position: endroit où afficher le message
+        :param police: police à utiliser pour écrire
         :return: "None"
         """
         self.up()
         self.goto(position)
         self.down()
-        self.write(message)
+        self.write(message, font=police)
+
+    def dessiner_graduations(self, origine, cote_grille):
+        x, y = origine
+        cote_case = Case.TAILLE
+        for i in range(cote_grille):
+            self.afficher_message(string.ascii_uppercase[i], (x+i*cote_case+cote_case/2.0, y+cote_case), police=("Arial", 12, "bold"))
+            self.afficher_message(str(i+1), (x-cote_case, y-i*cote_case-cote_case/2.0), police=("Arial", 12, "bold"))
+
+    def dessiner_case(self, case):
+        """
+        Dessine une case à l'écran.
+
+        :param case: case à dessiner
+        :return: "None"
+        """
+        self.fillcolor(self.couleur_case(case.etat))
+        points = case.carre()
+        self.up()
+        self.goto(points[0])
+        self.down()
+        self.begin_fill()
+        for i in range(1, len(points)):  # la tortue est déjà à "points[0]", donc on commence à 1
+            self.goto(points[i])
+        self.goto(points[0])
+        self.end_fill()
+
+    def dessiner_grille(self, cases):
+        """
+        Dessine la grille.
+
+        :param cases: grille à dessiner
+        :return: "None"
+        """
+        self.clear()
+        self.dessiner_graduations(cases[0][0].position, len(cases))
+        for ligne in cases:
+            for case in ligne:
+                self.dessiner_case(case)
+        self.screen.update()
 
 
 class Afficheur:
@@ -138,8 +131,7 @@ class Afficheur:
         :param grille: grille de jeu à afficher
         """
         self.grille = grille
-        self._mode = Mode.CONSOLE
-        self.tortue = None
+        self.tortue = Tortue()
         self.nombre_de_coups = 0
 
     def afficher(self, message, fin="\n"):
@@ -150,10 +142,8 @@ class Afficheur:
         :param fin: caractère à placer après le message
         :return:
         """
-        if self._mode == Mode.CONSOLE:
-            print(message, end=fin)
-        else:
-            self.tortue.afficher_message(message+fin, (0, self.grille.TAILLE*Case.TAILLE))
+        print(message, end=fin)
+        self.tortue.afficher_message(message+fin, (0, self.grille.TAILLE*Case.TAILLE))
 
     def recevoir_entree(self, texte_a_afficher=""):
         """
@@ -164,7 +154,6 @@ class Afficheur:
         """
         print(texte_a_afficher, end="")
         return stdin.readline().replace("\n", "")
-        # TODO: éventuellement adapter à la tortue
 
     def confirmer_question(self, question):
         """
@@ -178,8 +167,6 @@ class Afficheur:
         if entree in ("oui", "o"):
             return True
         return False
-        # TODO: adapter à la tortue
-            # TODO: Possibilités: 1. ajouter champ avec Tkinter 2. créer boutons avec tortue
 
     def afficher_erreur(self):
         """
@@ -196,20 +183,6 @@ class Afficheur:
         :return: Booléen indiquant si l'utilisateur veut quitter.
         """
         return self.confirmer_question("\nÊtes-vous sûr(e) de vouloir quitter? o/n\n")
-        # TODO: éventuellement adapter à la tortue
-
-    def confirmer_tortue(self):
-        """
-        Confirme si l'utilisateur veut utiliser la tortue ou non.
-
-        Si la tortue est déjà le mode de dessin, cette fonction affiche une erreur.
-        :return: Booléen indiquant si l'utilisateur veut utiliser la tortue
-        """
-        if self._mode == Mode.CONSOLE:
-            return self.confirmer_question("\nÊtes-vous sûr(e) de vouloir activer l'affichage avec la tortue?\n"
-                                           "Vous ne pourrez plus revenir à l'affichage dans le terminal. o/n")
-        self.afficher("La tortue est déjà le mode de dessin.")
-        return False
 
     def demander_rejouer(self):
         """
@@ -242,20 +215,8 @@ class Afficheur:
 
         :return: "None"
         """
-        if self._mode == Mode.CONSOLE:
-            self.dessiner_grille_console()
-        else:
-            self.tortue.dessiner_grille(self.grille)
-
-    def changer_vers_tortue(self):
-        """
-        Change le mode d'affichage pour utiliser la tortue.
-
-        :return: "None"
-        """
-        self._mode = Mode.TORTUE
-        self.tortue = Tortue()
-        self.tortue.initialiser(self.avancer_d_un_tour)
+        self.dessiner_grille_console()
+        self.tortue.dessiner_grille(self.grille.cases)
 
     def ajouter_espacement_avant(self, nombre=None):
         """
@@ -356,9 +317,7 @@ class Afficheur:
         :return:  État de la case après le tir si celui-ci a réussi, "None" si la case a déjà reçu un tir et "False"
         s'il y a eu une erreur
         """
-        if self._mode == Mode.CONSOLE:
-            return self.grille.tirer_console(coordonnees)
-        return self.grille.tirer_coord_ecran(coordonnees)
+        return self.grille.tirer(coordonnees)
 
     def afficher_retour_tir(self, retour):
         """
@@ -380,30 +339,19 @@ class Afficheur:
         else:
             self.afficher_erreur()
 
-    def avancer_d_un_tour(self, x=None, y=None, entree=None):
+    def avancer_d_un_tour(self, entree=None):
         """
-        Fonction permettant au jeu d'avancer d'un tour. Elle a été conçue pour fonctionner avec la tortue et la console.
+        Fonction permettant au jeu d'avancer d'un tour.
 
         Elle peut être passée à "turtle.Turtle.screen.onclick", car elle commence par les arguments "x" et "y"
-        :param x: position x du clic sur l'écran quand la fonction est passée à "turtle.Turtle.screen.onclick"
-        :param y: position y du clic sur l'écran quand la fonction est passée à "turtle.Turtle.screen.onclick"
         :param entree: entrée de l'utilisateur dans la console
         :return: booléen indiquant si le jeu doit continuer
         """
-        entree_convertie = entree  # On crée une variable globale à la fonction pour avoir la même variable pour
-                                   # l'entrée avec la tortue et la console
-        if x is not None and y is not None:
-            entree_convertie = self.grille.coord_ecran_vers_index(x, y)  # On convertit les coordonnées pour pouvoir les
-                                                                         # utiliser avec d'autres méthodes
         continuer = True
         if chaine_nettoyee(entree) in ("quitter", "q"):  # Si l'utilisateur veut quitter
             continuer = not self.confirmer_quitter()
-        elif chaine_nettoyee(entree) in ("tortue", "t"):
-            if self.confirmer_tortue():  # Si l'utilisateur veut utiliser la tortue
-                self.changer_vers_tortue()
-                # Le code ne dépasse jamais ce point, car on entre dans la boucle des évènements de la tortue
         else:
-            retour = self.grille.tirer_console(entree_convertie)  # On tire sur la case et on enregistre le retour de la méthode
+            retour = self.grille.tirer(entree)  # On tire sur la case et on enregistre le retour de la méthode
             self.afficher_retour_tir(retour)
             self.actualiser()
 

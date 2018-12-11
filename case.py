@@ -45,7 +45,7 @@ class Case:
     """
     Classe permettant de créer des objets de type case, composants élémentaires de la grille de jeu.
     """
-    TAILLE = 10  # taille en pixels, le nom est en majuscules par convention, car c'est une constante
+    TAILLE = 40  # taille en pixels, le nom est en majuscules par convention, car c'est une constante
     CARACTERES_ETAT = ["_", "*", "o", "x", "#"]  # TODO: remettre "_" (tiret en bas) à la place de "*"
 
     def __init__(self, position, etat=Etat.VIDE, bateau=None):
@@ -194,12 +194,14 @@ class Grille:
         else:
             self.TAILLE = self.__class__.TAILLE_MAX
         self.cases = []
+        decalage_x = -self.TAILLE*Case.TAILLE/2.0  # décalage permettant de centrer la grille
+        decalage_y = (self.TAILLE-1)*Case.TAILLE/2.0  # on décale moins, car sinon la grille est trop haute
         for i in range(self.TAILLE):
-            colonne = []
+            ligne = []
             for j in range(self.TAILLE):
-                position = (i*Case.TAILLE, -j*Case.TAILLE)
-                colonne.append(Case(position))
-            self.cases.append(colonne)
+                position = (j*Case.TAILLE+decalage_x, -i*Case.TAILLE+decalage_y)
+                ligne.append(Case(position))
+            self.cases.append(ligne)
 
     @staticmethod
     def element_dans_liste(element, liste):
@@ -314,12 +316,6 @@ class Grille:
             bateau.set_cases(random.choice(cases_possibles))  # Sélectionne un groupe de cases aléatoire pour les cases du bateau
         return True
 
-    def coord_ecran_vers_index(self, coordonnees):
-        origine = self.cases[0][0].position
-        dist_origine_x = coordonnees[Coord.x] - origine[Coord.x]
-        dist_origine_y = coordonnees[Coord.y] - origine[Coord.y]
-        # TODO: continuer méthode
-
     def coord_bataille_vers_index(self, coordonnees):
         """
         Convertit les coordonnées de la bataille navale (ex : "A5" ou ("A", 5)) en coordonnées de la grille (ex: (1, 5)).
@@ -332,21 +328,21 @@ class Grille:
         copie_coordonnees = copie_coordonnees.replace(".", "")  # On enlève les points
         copie_coordonnees = copie_coordonnees.replace(",", "")  # On enlève les virgules
         copie_coordonnees = copie_coordonnees.lower()  # On met tout en minuscules.
-
         x = ""
         lettres = ""
-        while copie_coordonnees[0].isalpha():
+        while copie_coordonnees and copie_coordonnees[0].isalpha():
             lettres += copie_coordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copie_coordonnees".
             copie_coordonnees = copie_coordonnees[1:len(copie_coordonnees)]
         for c in lettres:
             x += str(string.ascii_letters.index(c))  # On transforme les lettres en nombres TODO: Augmenter sécurité
-        x = int(x)
-
-        y = int(copie_coordonnees) - 1
+        try:
+            x = int(x)
+            y = int(copie_coordonnees) - 1
+        except ValueError:  # Si on arrive pas à convertir x ou y en nombres
+            return False
         if x in range(self.TAILLE) and y in range(self.TAILLE):
             return x, y
-        else:
-            return False
+        return False
 
     @staticmethod
     def index_vers_coord_bataille(index):
@@ -359,10 +355,6 @@ class Grille:
         lettre = string.ascii_uppercase[index[Coord.x]]  # On convertit la coordonnée x en lettre majuscule
         nombre = index[Coord.y] + 1
         return lettre + str(nombre)
-
-    def tirer_coord_ecran(self, coordonnees):
-        pass
-        # TODO: terminer méthode
 
     def sont_coordonnees_index(self, coordonnees):
         """
@@ -380,7 +372,7 @@ class Grille:
                     return True
         return False  # Si une des conditions plus haut n'est pas satisfaite, on renvoie "False"
 
-    def tirer_console(self, coordonnees):
+    def tirer(self, coordonnees):
         """
         Méthode permettant de tirer aux coordonnées "coordonnees".
 
