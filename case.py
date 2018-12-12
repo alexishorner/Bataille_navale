@@ -169,15 +169,16 @@ class Case:
         """
         Méthode appelée lorsqu'un tir est dirigé vers cette case.
 
-        :return: État de la case après l'opération ou "None" si la case a déjà reçu un tir ou "False" s'il y a eu une erreur
+        :return: 1. État de la case après l'opération ou "None" si la case a déjà reçu un tir ou "False" s'il y a eu une erreur
+                 2. Cases modifiées s'il y en a, "None" sinon
         """
         if self._bateau is not None:  # si un bateau est présent sur la case
             return self._bateau.recevoir_tir(self)
         else:
             if self.etat != Etat.DANS_L_EAU:
                 self.etat = Etat.DANS_L_EAU
-                return self.etat
-            return None
+                return self.etat, [self]
+            return None, None
 
 
 class Grille:
@@ -382,8 +383,9 @@ class Grille:
         Les coordonnées peuvent être sous deux formes différentes : index de la case ou coordonnées de la bataille
         navale, par ex : "A6".
         :param coordonnees: coordonnées où tirer
-        :return: État de la case après le tir si celui-ci a réussi, "None" si la case a déjà reçu un tir et "False"
-        s'il y a eu une erreur
+        :return: 1. État de la case après le tir si celui-ci a réussi, "None" si la case a déjà reçu un tir et "False"
+                    s'il y a eu une erreur
+                 2. Cases modifiées s'il y en a, "None" sinon
         """
         # On vérifie que les coordonnées sont valides et on les convertit en index
         if type(coordonnees) is str:  # Si les coordonnées sont présentées en coordonnées de la bataille navale
@@ -391,9 +393,9 @@ class Grille:
         elif self.sont_coordonnees_index(coordonnees):
             coordonnees_index = coordonnees
         else:
-            return False
+            return False, None
         if not coordonnees_index:
-            return False
+            return False, None
 
         case = self.cases[coordonnees_index[1]][coordonnees_index[0]]   # On accède la case visée, tout en faisant
                                                                         # attention à mettre la coordonnée y en premier

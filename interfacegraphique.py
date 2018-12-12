@@ -158,7 +158,7 @@ class Afficheur:
     def rejouer(self):
         self.grille.reinitialiser()
         self.grille.placer_bateaux()
-        self.actualiser()
+        self.dessiner_tout()
         self._nombre_de_coups = 0
 
     def sur_coup_joue(self):
@@ -234,14 +234,29 @@ class Afficheur:
             else:
                 self.afficher("Erreur, entrée invalide")
 
-    def actualiser(self):
+    def dessiner_tout(self):
         """
-        Actualise l'écran.
+        Dessine la grille en entier avec la tortue et dans la console et affiche différentes informations.
 
+        C'est ici que les éléments à l'écran ne changeant pas, comme le fond d'écran, sont dessinés.
         :return: "None"
         """
         self.dessiner_grille_console()
         self.tortue.dessiner_grille(self.grille.cases)
+        self.afficher_coups_restants()
+
+    def actualiser(self, cases=None):
+        """
+        Actualise l'écran.
+
+        :param cases: liste de cases à actualiser
+        :return: "None"
+        """
+        self.dessiner_grille_console()
+        if cases is not None:
+            for case in cases:
+                self.tortue.dessiner_case(case)
+        self.tortue.screen.update()
         self.afficher_coups_restants()
 
     def ajouter_espacement_avant(self, nombre=None):
@@ -380,9 +395,9 @@ class Afficheur:
         if chaine_nettoyee(entree) in ("quitter", "q"):  # Si l'utilisateur veut quitter
             continuer = not self.confirmer_quitter()
         else:
-            retour = self.grille.tirer(entree)  # On tire sur la case et on enregistre le retour de la méthode
-            self.afficher_retour_tir(retour)
-            self.actualiser()
+            retour, cases = self.grille.tirer(entree)  # On tire sur la case et on enregistre le retour de la méthode
+            self.afficher_retour_tir(retour)  # TODO: continuer
+            self.actualiser(cases)
 
             if self.joueur_a_gagne():
                 print("Vous avez gagné, bravo!")
@@ -406,7 +421,7 @@ class Afficheur:
         Demande à l'utlisateur où il veut tirer et tire sur la case.
         :return: "None"
         """
-        self.actualiser()
+        self.dessiner_tout()
         continuer = True
         while continuer:
             entree = self.recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
