@@ -48,6 +48,7 @@ class Tortue(turtle.Turtle):
     Cette classe permet de customiser la tortue fournie par le module "turtle".
     """
     COULEUR_DEFAUT = "white"  # couleur de l'intértieur des cases
+    COULEUR_ARRIERE_PLAN = "white"
 
 
     def __init__(self):
@@ -58,6 +59,10 @@ class Tortue(turtle.Turtle):
         self.hideturtle()  # cache la tortue
         self.screen.tracer(0, 0)  # rend le dessin instantané, mais l'écran doit être rafraîchit manuellement en appelant "self.screen.update()"
         self.fillcolor(self.couleur_case(Etat.VIDE))
+        self.ancien_message = ""
+        self.ancienne_position = (0, 0)
+        self.ancien_alignement = "left"
+        self.ancienne_police = ("Arial", 8, "normal")
 
     @staticmethod
     def couleur_case(etat):
@@ -76,6 +81,18 @@ class Tortue(turtle.Turtle):
         else:
             return "white"
 
+    def _effacer_ancien_message(self):
+        self._ecrire(self.ancien_message, self.ancienne_position, self.ancien_alignement, self.ancienne_police, self.COULEUR_ARRIERE_PLAN)
+
+    def _ecrire(self, message, position, alignement="left", police=("Arial", 8, "normal"), couleur="black"):
+        ancienne_couleur = self.pencolor()
+        self.pencolor(couleur)
+        self.up()
+        self.goto(position)
+        self.down()
+        self.write(message, align=alignement, font=police)
+        self.pencolor(ancienne_couleur)
+
     def afficher_message(self, message, position, alignement="left", police=("Arial", 8, "normal")):
         """
         Affiche un message à une certaine position.
@@ -86,10 +103,15 @@ class Tortue(turtle.Turtle):
         :param police: police à utiliser pour écrire
         :return: "None"
         """
+        self._effacer_ancien_message()
         self.up()
         self.goto(position)
         self.down()
         self.write(message, align=alignement, font=police)
+        self.ancienne_position = position
+        self.ancien_message = message
+        self.ancien_alignement = alignement
+        self.ancienne_police = police
 
     def dessiner_graduations(self, origine, cote_grille):
         x_0, y_0= origine
@@ -99,10 +121,10 @@ class Tortue(turtle.Turtle):
         for i in range(cote_grille):
             x = x_0+i*cote_case+cote_case/2.0
             y = y_0+cote_case+decimales_max*taille_police/2.0
-            self.afficher_message(string.ascii_uppercase[i], (x, y), alignement="center", police=("Arial", taille_police, "bold"))
+            self._ecrire(string.ascii_uppercase[i], (x, y), alignement="center", police=("Arial", taille_police, "bold"))
             x = x_0-decimales_max*taille_police/2.0
             y = y_0-(i-1)*cote_case-cote_case/2.0-taille_police
-            self.afficher_message(str(i+1), (x, y), alignement="right", police=("Arial", taille_police, "bold"))
+            self._ecrire(str(i+1), (x, y), alignement="right", police=("Arial", taille_police, "bold"))
 
     def dessiner_case(self, case):
         """
@@ -141,7 +163,7 @@ class Afficheur:
     """
     Cette classe permet de dessiner les objets à l'écran. Elle utilise un objet "Tortue" ou la console pour dessiner à l'écran.
     """
-    NOMBRE_DE_COUPS_MAX = 30
+    NOMBRE_DE_COUPS_MAX = 50
     def __init__(self, grille):
         """
         constructeur de la classe "Stylo"
@@ -156,10 +178,13 @@ class Afficheur:
         return self.NOMBRE_DE_COUPS_MAX-self._nombre_de_coups
 
     def rejouer(self):
-        self.grille.reinitialiser()
-        self.grille.placer_bateaux()
-        self.dessiner_tout()
         self._nombre_de_coups = 0
+        import time
+        a = time.time()
+        self.grille.placer_bateaux()
+        b = time.time()
+        self.dessiner_tout()
+        print(str(b-a))
 
     def sur_coup_joue(self):
         self._nombre_de_coups += 1
@@ -363,7 +388,7 @@ class Afficheur:
         """
         return self.grille.tirer(coordonnees)
 
-    def afficher_retour_tir(self, retour):
+    def afficher_retour_tir(self, retour, cases):
         """
         Affiche un message à l'écran en fonction du retour de la fonction de tir
 
@@ -378,7 +403,9 @@ class Afficheur:
             elif retour == Etat.TOUCHE:
                 self.afficher("Touché")
             else:
-                self.afficher("Coulé")
+                type = cases[0].bateau().TYPE  # On récupère le type du bateau touché
+                type = type[0].upper() + type[1:len(type)]  # On met la première lettre en majuscules
+                self.afficher(type + " coulé")
             self.sur_coup_joue()
         else:
             self.afficher_erreur()
@@ -396,7 +423,7 @@ class Afficheur:
             continuer = not self.confirmer_quitter()
         else:
             retour, cases = self.grille.tirer(entree)  # On tire sur la case et on enregistre le retour de la méthode
-            self.afficher_retour_tir(retour)  # TODO: continuer
+            self.afficher_retour_tir(retour, cases)  # TODO: continuer
             self.actualiser(cases)
 
             if self.joueur_a_gagne():
@@ -421,7 +448,7 @@ class Afficheur:
         Demande à l'utlisateur où il veut tirer et tire sur la case.
         :return: "None"
         """
-        self.dessiner_tout()
+        self.rejouer()
         continuer = True
         while continuer:
             entree = self.recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3

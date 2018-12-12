@@ -233,10 +233,10 @@ class Grille:
         for ligne in self.cases:
             for case in ligne:
                 case.etat = Etat.VIDE  # Remet l'état de chaque case à zéro
-        pass
 
-    def cases_libres(self):
+    def __obsolete_cases_libres(self):
         """
+        ATTENTION, cette fonction est obsolète
         Méthode retournant des groupes de cases libres alignées et adjacentes.
         Exemple:
              _A_B_C_D_E_
@@ -287,14 +287,15 @@ class Grille:
         cases_libres = libres_horizontales + libres_verticales
         return sorted(cases_libres, key=lambda x: len(x))  # On renvoie les groupes de cases par ordre croissant de taille
 
-    def groupes_de_cases_libres(self, longueur):
+    def __obsolete_groupes_de_cases_libres(self, longueur):
         """
+        ATTENTION, cette fonction est obsolète
         Fonction renvoyant tous les groupes de cases libres possibles ayant une certaine longueur.
 
         :param longueur: longueur des groupes
         :return: liste contenant les groupes de cases libres
         """
-        cases_libres = self.cases_libres()
+        cases_libres = self.__obsolete_cases_libres()
         groupes = list(cases_libres)  # On crée une copie des cases libres
         for groupe in cases_libres:
             if len(groupe) < longueur:
@@ -306,19 +307,52 @@ class Grille:
                 groupes.remove(groupe)
         return groupes
 
-    def placer_bateaux(self):
+    def __obsolete_placer_bateaux(self):
         """
+        ATTENTION, fonction obsolète
         Fonction permettant de placer des bateaux de manière aléatoire sur la grille
 
-        :param bateaux: bateaux à placer
         :return: réussite de l'opération
         """
+        self.reinitialiser()
         bateaux_a_placer = trier_bateaux_par_taille(self.bateaux, True)  # On trie les bateaux dans l'ordre décroissant pour
                                                                          # placer les plus grands en premier
         for bateau in bateaux_a_placer:
-            cases_possibles = self.groupes_de_cases_libres(bateau.TAILLE)  # TODO: attention bugs possibles si aucun groupe n'est trouvé
+            cases_possibles = self.__obsolete_groupes_de_cases_libres(bateau.TAILLE)  # TODO: attention bugs possibles si aucun groupe n'est trouvé
             bateau.set_cases(random.choice(cases_possibles))  # Sélectionne un groupe de cases aléatoire pour les cases du bateau
         return True
+
+    def placer_bateaux(self):  # TODO: vérifier méthode
+        self.reinitialiser()
+        bateaux_a_placer = trier_bateaux_par_taille(self.bateaux, True)  # On trie les bateaux dans l'ordre décroissant pour
+                                                                         # placer les plus grands en premier
+        for bateau in bateaux_a_placer:
+            recommencer = True
+            while recommencer:  # Cette boucle se répète tant qu'on a pas réussi a placer le bateau
+                cases_bateau = []
+                index_premiere_case = (random.randint(0, self.TAILLE-1), random.randint(0, self.TAILLE-1))
+                sens_vertical = random.choice((0, 0, -1, 1))  # Variable déterminant dans quel sens on cherche les cases horizontalement
+                if sens_vertical == 0:  # Si on cherche les cases verticalement
+                    sens_horizontal = random.choice((-1, 1))  # on détermine si on cherche vers la gauche ou la droite
+                else:
+                    sens_horizontal = 0  # La valeur 0 empêche de chercher horizontalement
+                index_derniere_case = (index_premiere_case[Coord.y] + sens_vertical*bateau.TAILLE,
+                                       index_premiere_case[Coord.x] + sens_horizontal*bateau.TAILLE)
+                if (index_derniere_case[Coord.y] in range(self.TAILLE) and
+                    index_derniere_case[Coord.x] in range(self.TAILLE)):  # Si la dernière case est dans la grille
+                    for i in range(bateau.TAILLE):
+                        index_y = index_premiere_case[Coord.y]+i*sens_vertical
+                        index_x = index_premiere_case[Coord.x]+i*sens_horizontal
+                        case = self.cases[index_y][index_x]
+                        if case.bateau() is None:  # Si la case est vide
+                            cases_bateau.append(case)
+                        else:
+                            break   # Si au moins une case n'est pas vide, on sort de la boucle for et on recommence au
+                                    # début de la boucle while
+                    if len(cases_bateau) == bateau.TAILLE:  # Si toutes les cases parcourues étaient vides
+                        bateau.set_cases(cases_bateau)
+                        recommencer = False
+
 
     def coord_bataille_vers_index(self, coordonnees):
         """
