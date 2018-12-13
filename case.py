@@ -45,8 +45,10 @@ class Coord(IntEnum):
 class Case:
     """
     Classe permettant de créer des objets de type case, composants élémentaires de la grille de jeu.
+
+    La position de chaque case est la position de son coin inférieur gauche.
     """
-    TAILLE = 40  # taille en pixels, le nom est en majuscules par convention, car c'est une constante
+    largeur_pixels = 40  # taille en pixels, le nom est en majuscules par convention, car c'est une constante
     CARACTERES_ETAT = ["_", "*", "o", "x", "#"]  # TODO: remettre "_" (tiret en bas) à la place de "*"
 
     def __init__(self, position, etat=Etat.VIDE, bateau=None):
@@ -114,7 +116,7 @@ class Case:
                 if cls.sont_alignees((case1, case2)):
                     separation_horizontale = abs(case1.position[Coord.x] - case2.position[Coord.x])
                     separation_verticale = abs(case1.position[Coord.y] - case2.position[Coord.y])
-                    if separation_horizontale < cls.TAILLE or separation_verticale < cls.TAILLE:
+                    if separation_horizontale < cls.largeur_pixels or separation_verticale < cls.largeur_pixels:
                         case1_a_un_voisin = True
             if not case1_a_un_voisin:
                 return False
@@ -126,7 +128,7 @@ class Case:
         """
         x = self.position[Coord.x]
         y = self.position[Coord.y]
-        cote = self.__class__.TAILLE
+        cote = self.largeur_pixels
         return [x, y], [x+cote, y], [x+cote, y+cote], [x, y+cote]
 
     def milieu(self):
@@ -135,7 +137,7 @@ class Case:
         """
         x = self.position[Coord.x]
         y = self.position[Coord.y]
-        demi_longueur = self.TAILLE/2.0
+        demi_longueur = self.largeur_pixels / 2.0
         return x + demi_longueur, y + demi_longueur
 
     def caractere_etat(self):
@@ -186,26 +188,58 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
     """
     Classe représentant la grille de jeu de la bataille navale.
 
-    C'est un tableau en deux dimensions stockant des cases.
+    Elle contient un tableau en deux dimensions stockant des cases. La première case est dans le coin supérieur gauche.
     Les cases sont accédées de la manière suivante: self.cases[ligne][colonne]
     """
+    LARGEUR_PIXELS_IDEALE = 400.0
     TAILLE_MAX = 26  # Si la taille excède 26, les coordonnées nécessitent plusieurs lettres
 
     def __init__(self, bateaux, taille=10):
         self.bateaux = bateaux
-        if taille < 26:
-            self.TAILLE = taille
-        else:
-            self.TAILLE = self.__class__.TAILLE_MAX
         self.cases = []
-        decalage_x = -self.TAILLE*Case.TAILLE/2.0  # décalage permettant de centrer la grille
-        decalage_y = (self.TAILLE-4)*Case.TAILLE/2.0  # on décale moins, car sinon la grille est trop haute
-        for i in range(self.TAILLE):
+        self.taille = 0  # On crée la variable "self.taille"
+        self.set_taille(taille)  # On change la valeur de "self.taille"
+
+    def creer_cases(self):
+        self.cases = []
+        Case.largeur_pixels = round(self.LARGEUR_PIXELS_IDEALE / self.taille)  # ajuste la largeur des cases en fonction de la taille de la grille
+        decalage_x = -self.taille * Case.largeur_pixels / 2.0  # décalage permettant de centrer la grille
+        decalage_y = (self.taille - 4) * Case.largeur_pixels / 2.0  # on décale moins, car sinon la grille est trop haute
+        for i in range(self.taille):
             ligne = []
-            for j in range(self.TAILLE):
-                position = (j*Case.TAILLE+decalage_x, -i*Case.TAILLE+decalage_y)
+            for j in range(self.taille):
+                position = (j * Case.largeur_pixels + decalage_x, -i * Case.largeur_pixels + decalage_y)
                 ligne.append(Case(position))
             self.cases.append(ligne)
+
+    def set_taille(self, taille):
+        """
+        Change la taille de la grille.
+
+        :param taille: nouvelle taille de la grille
+        :return:
+        """
+        if taille <= self.TAILLE_MAX:
+            self.taille = taille
+        else:
+            self.taille = self.TAILLE_MAX
+        self.taille = taille
+        self.creer_cases()
+
+    def largeur_pixels(self):
+        """
+        Renvoie la largeur exacte de la grille en pixels.
+
+        :return: largeur de la grille en pixels
+        """
+        return self.taille * Case.largeur_pixels
+
+    def position_coins(self):
+        coin_superieur_gauche = self.cases[0][0].carre()[3]
+        coin_inferieur_gauche = self.cases[self.taille-1][0].carre()[0]
+        coin_inferieur_droit = self.cases[self.taille-1][self.taille-1].carre()[1]
+        coin_superieur_droit = self.cases[0][self.taille-1].carre()[2]
+        return coin_superieur_gauche, coin_inferieur_gauche, coin_inferieur_droit, coin_inferieur_droit
 
     def bateaux_restants(self):
         """
@@ -255,7 +289,7 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
             recommencer = True
             while recommencer and time.time()-temps_depart < 1:  # Cette boucle se répète tant qu'on a pas réussi a placer le bateau
                 cases_bateau = []
-                index_premiere_case = (random.randint(0, self.TAILLE-1), random.randint(0, self.TAILLE-1))
+                index_premiere_case = (random.randint(0, self.taille - 1), random.randint(0, self.taille - 1))
                 sens_vertical = random.choice((0, 0, -1, 1))  # Variable déterminant dans quel sens on cherche les cases horizontalement
                 if sens_vertical == 0:  # Si on cherche les cases verticalement
                     sens_horizontal = random.choice((-1, 1))  # on détermine si on cherche vers la gauche ou la droite
@@ -263,8 +297,8 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
                     sens_horizontal = 0  # La valeur 0 empêche de chercher horizontalement
                 index_derniere_case = (index_premiere_case[Coord.y] + sens_vertical*bateau.TAILLE,
                                        index_premiere_case[Coord.x] + sens_horizontal*bateau.TAILLE)
-                if (index_derniere_case[Coord.y] in range(self.TAILLE) and
-                    index_derniere_case[Coord.x] in range(self.TAILLE)):  # Si la dernière case est dans la grille
+                if (index_derniere_case[Coord.y] in range(self.taille) and
+                    index_derniere_case[Coord.x] in range(self.taille)):  # Si la dernière case est dans la grille
                     for i in range(bateau.TAILLE):
                         index_y = index_premiere_case[Coord.y]+i*sens_vertical
                         index_x = index_premiere_case[Coord.x]+i*sens_horizontal
@@ -305,7 +339,7 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
             y = int(copie_coordonnees) - 1
         except ValueError:  # Si on arrive pas à convertir x ou y en nombres
             return False
-        if x in range(self.TAILLE) and y in range(self.TAILLE):
+        if x in range(self.taille) and y in range(self.taille):
             return x, y
         return False
 
@@ -332,7 +366,7 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
             if len(coordonnees) == 2:
                 for coordonnee in coordonnees:
                     if (type(coordonnee) is not int and type(coordonnees) is not float # Si le type des coordonnées n'est pas un nombre
-                    or coordonnee not in range(self.TAILLE)):  # ou si les coordonnées n'ont pas la bonne valeur
+                    or coordonnee not in range(self.taille)):  # ou si les coordonnées n'ont pas la bonne valeur
                         return False
                     return True
         return False  # Si une des conditions plus haut n'est pas satisfaite, on renvoie "False"

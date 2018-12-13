@@ -9,7 +9,7 @@ class AbstractBateau:
 
     Le mot "Abstract" dans son nom indique qu'elle n'est pas conçue pour être utilisée de manière directe.
     """
-    TAILLE = None  # l'attribut "TAILLE" est défini en dehors du constructeur, car chaque bateau d'un même type a la même taille
+    TAILLE = None  # l'attribut "largeur_pixels" est défini en dehors du constructeur, car chaque bateau d'un même type a la même taille
     TYPE = None  # le type est lui aussi commun à tous les bateaux d'une même classe
 
     def __init__(self, cases=None):
@@ -43,7 +43,7 @@ class AbstractBateau:
                 case.set_bateau(None)
             self._cases = []
         elif len(cases) == self.TAILLE and Case.sont_alignees(cases) and Case.sont_adjacentes(cases):
-            # Le "self.__class__.TAILLE" permet d'accéder à la taille du bateau,
+            # Le "self.__class__.largeur_pixels" permet d'accéder à la taille du bateau,
             # y compris avec les classes héritant de "AbstractBateau".
             # Cette condition vérifie qu'il y a le bon nombre de cases, qu'elle sont alignées et
             # qu'il n'y a pas d'espace les séparant.

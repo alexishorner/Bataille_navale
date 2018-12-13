@@ -131,8 +131,8 @@ class Tortue(turtle.Turtle):
         """
         x_0, y_0 = origine
         decimales_max = decimales(cote_grille)  # Nombre de caractères pour écrire le nombre
-        cote_case = Case.TAILLE  # Taille en pixels de la case
-        taille_police = int(Case.TAILLE/10.0+8)  # Taille de la police
+        cote_case = Case.largeur_pixels  # Taille en pixels de la case
+        taille_police = int(Case.largeur_pixels / 10.0 + 8)  # Taille de la police
         for i in range(cote_grille):
             x = x_0+i*cote_case+cote_case/2.0
             y = y_0+cote_case+decimales_max*taille_police/2.0
@@ -159,7 +159,7 @@ class Tortue(turtle.Turtle):
         self.goto(points[0])
         self.end_fill()
 
-    def dessiner_grille(self, cases):  # TODO: ajuster taille cases dynamiquement
+    def dessiner_grille(self, cases):
         """
         Dessine la grille.
 
@@ -178,8 +178,8 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
     """
     Cette classe permet de dessiner les objets à l'écran. Elle utilise un objet "Tortue" ou la console pour dessiner à l'écran.
     """
-    NOMBRE_DE_COUPS_MAX = 50
     TEMPS_MAX = 120  # TODO: implémenter contrainte de temps
+    
     def __init__(self, grille):
         """
         constructeur de la classe "Afficheur"
@@ -189,6 +189,14 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         self.grille = grille
         self.tortue = Tortue()
         self.nombre_de_coups = 0
+        
+    def nombre_de_coups_max(self):
+        """
+        Renvoie le nombre de coups en fonction du nombre de cases dans la grille.
+        
+        :return: nombre de cases divisé par 2
+        """
+        return int(round(self.grille.taille**2/2.0))
 
     def coups_restants(self):
         """
@@ -196,7 +204,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
 
         :return: nombre de coups restants
         """
-        return self.NOMBRE_DE_COUPS_MAX-self.nombre_de_coups
+        return self.nombre_de_coups_max()-self.nombre_de_coups
 
     def joueur_a_perdu(self):  # TODO: ajouter autres contraintes
         """
@@ -228,7 +236,8 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         :return:
         """
         print(message, end=fin)
-        self.tortue.afficher_message(message+fin, (0, -(self.grille.TAILLE+4)*Case.TAILLE/2.0), alignement="center")
+        position = (0, self.grille.position_coins()[1][1]-40)  # On place en bas au milieu de la grille
+        self.tortue.afficher_message(message + fin, position, alignement="center")
 
     def afficher_coups_restants(self):
         self.afficher("Coups restants : " + str(self.coups_restants()))
@@ -331,7 +340,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         :param nombre: nombre qui doit être aligné
         :return: "None"
         """
-        espacement_total = decimales(self.grille.TAILLE)
+        espacement_total = decimales(self.grille.taille)
         if nombre is None:
             espacement = espacement_total
         else:
@@ -346,7 +355,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         :return: "None"
         """
         self.ajouter_espacement_avant()
-        for index_x in range(self.grille.TAILLE):
+        for index_x in range(self.grille.taille):
             print("_" + string.ascii_uppercase[index_x], end="")
         print("_\n", end="")
 
@@ -361,7 +370,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         case = self.grille.cases[index_y][index_x]
         print("|", end="")
         print(case.caractere_etat(), end="")
-        if index_x == self.grille.TAILLE-1:
+        if index_x == self.grille.taille-1:
             print("|\n", end="")
 
     def dessiner_grille_console(self):  # TODO: faire en sorte de pouvoir actualiser la grille sans l'afficher plusieurs fois
@@ -382,8 +391,8 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
             10|_|_|_|_|_|_|_|_|_|_|
         :return: "None"
         """
-        for index_y in range(self.grille.TAILLE):
-            for index_x in range(self.grille.TAILLE):
+        for index_y in range(self.grille.taille):
+            for index_x in range(self.grille.taille):
                 if index_y == 0 and index_x == 0:
                     self.dessiner_premiere_ligne_console()
 
@@ -475,7 +484,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         continuer = True
         while continuer:
             entree = self.recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
-            #entree = string.ascii_uppercase[random.randint(0, self.grille.TAILLE)] + str(random.randint(0, self.grille.TAILLE))
+            #entree = string.ascii_uppercase[random.randint(0, self.grille.largeur_pixels)] + str(random.randint(0, self.grille.largeur_pixels))
             # TODO: enlever ligne de test
             continuer = self.avancer_d_un_tour(entree)
 
