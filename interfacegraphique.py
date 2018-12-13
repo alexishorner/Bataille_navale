@@ -50,7 +50,6 @@ class Tortue(turtle.Turtle):
     COULEUR_DEFAUT = "white"  # couleur de l'intértieur des cases
     COULEUR_ARRIERE_PLAN = "white"
 
-
     def __init__(self):
         """
         constructeur de la classe "Tortue"
@@ -81,6 +80,21 @@ class Tortue(turtle.Turtle):
         else:
             return "white"
 
+    def aller_a(self, x, y=None):
+        """
+        Va à une position sans laisser de traces.
+
+        :param x: entier représentant la coordonnée x ou liste contenant les deux coordonnées.
+        :param y: entier représentant la coordonnée y
+        :return: "None"
+        """
+        self.up()
+        if y is None:
+            self.goto(x)
+        else:
+            self.goto(x, y)
+            self.down()
+
     def _effacer_ancien_message(self):
         self._ecrire(self.ancien_message, self.ancienne_position, self.ancien_alignement, self.ancienne_police, self.COULEUR_ARRIERE_PLAN)
         # TODO: faire en sorte de pouvoir effacer le nombre de coups séparément du retour de tir
@@ -98,9 +112,7 @@ class Tortue(turtle.Turtle):
         """
         ancienne_couleur = self.pencolor()  # Enregistre la couleur de la tortue
         self.pencolor(couleur)
-        self.up()
-        self.goto(position)
-        self.down()
+        self.aller_a(position)
         self.write(message, align=alignement, font=police)
         self.pencolor(ancienne_couleur)  # Rétablit la couleur de la tortue
 
@@ -119,6 +131,7 @@ class Tortue(turtle.Turtle):
         self.ancienne_position = position
         self.ancien_message = message
         self.ancien_alignement = alignement
+        self.ancienne_police = police
         self.ancienne_police = police
 
     def dessiner_graduations(self, origine, cote_grille):
@@ -150,9 +163,7 @@ class Tortue(turtle.Turtle):
         """
         self.fillcolor(self.couleur_case(case.etat))
         points = case.carre()
-        self.up()
-        self.goto(points[0])  # Va au point inférieur droite de la case
-        self.down()
+        self.aller_a(points[0])  # Va au point inférieur droite de la case
         self.begin_fill()
         for i in range(1, len(points)):  # la tortue est déjà à "points[0]", donc on commence à 1
             self.goto(points[i])
@@ -232,14 +243,36 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         Affiche un message.
 
         :param message: message à afficher
-        :param fin: caractère à placer après le message
+        :param fin: caractère à placer dans la console après le message
         :return:
         """
         print(message, end=fin)
-        position = (0, self.grille.position_coins()[1][1]-40)  # On place en bas au milieu de la grille
-        self.tortue.afficher_message(message + fin, position, alignement="center")
+        position = (0, self.grille.position_coins()[1][1]-25)  # On place en bas au milieu de la grille
+        self.tortue.afficher_message(message, position, alignement="center", police=("Arial", 8, "bold"))
+
+    def afficher_menu(self):
+        """
+        Affiche le menu.
+
+        :return: "None"
+        """
+        titre = "       Menu       "
+        texte = ["1.  Nouvelle partie",
+                 "2.  Paramètres     ",
+                 "3.  Quitter        "]
+        x, y = 0, 40
+        print(titre)
+        self.tortue._ecrire(titre, (x, y), alignement="center", police=("Arial", 12, "bold"))
+        for i, ligne in enumerate(texte):
+            print(ligne)
+            self.tortue._ecrire(ligne, (x, y-40-i*20), alignement="center", police=("Arial", 12, "normal"))
 
     def afficher_coups_restants(self):
+        """
+        Affiche le nombre de coups restants pour l'utilisateur.
+
+        :return: "None"
+        """
         self.afficher("Coups restants : " + str(self.coups_restants()))
 
     def afficher_erreur(self):
