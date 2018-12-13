@@ -83,15 +83,26 @@ class Tortue(turtle.Turtle):
 
     def _effacer_ancien_message(self):
         self._ecrire(self.ancien_message, self.ancienne_position, self.ancien_alignement, self.ancienne_police, self.COULEUR_ARRIERE_PLAN)
+        # TODO: faire en sorte de pouvoir effacer le nombre de coups séparément du retour de tir
 
     def _ecrire(self, message, position, alignement="left", police=("Arial", 8, "normal"), couleur="black"):
-        ancienne_couleur = self.pencolor()
+        """
+        Écrit un message à l'écran
+
+        :param message: message à écrire
+        :param position: endroit où écrire le message
+        :param alignement: alignement du texte
+        :param police: police à utiliser
+        :param couleur: couleur du texte
+        :return: "None"
+        """
+        ancienne_couleur = self.pencolor()  # Enregistre la couleur de la tortue
         self.pencolor(couleur)
         self.up()
         self.goto(position)
         self.down()
         self.write(message, align=alignement, font=police)
-        self.pencolor(ancienne_couleur)
+        self.pencolor(ancienne_couleur)  # Rétablit la couleur de la tortue
 
     def afficher_message(self, message, position, alignement="left", police=("Arial", 8, "normal")):
         """
@@ -104,20 +115,24 @@ class Tortue(turtle.Turtle):
         :return: "None"
         """
         self._effacer_ancien_message()
-        self.up()
-        self.goto(position)
-        self.down()
-        self.write(message, align=alignement, font=police)
+        self._ecrire(message, position, alignement, police)
         self.ancienne_position = position
         self.ancien_message = message
         self.ancien_alignement = alignement
         self.ancienne_police = police
 
     def dessiner_graduations(self, origine, cote_grille):
-        x_0, y_0= origine
-        decimales_max = decimales(cote_grille)
-        cote_case = Case.TAILLE
-        taille_police = int(Case.TAILLE/10.0+8)
+        """
+        Dessine les graduations à côté de la grille.
+
+        :param origine: origine de la case supérieure gauche de la grille.
+        :param cote_grille: nombre de cases composant le côté de la grille
+        :return: "None"
+        """
+        x_0, y_0 = origine
+        decimales_max = decimales(cote_grille)  # Nombre de caractères pour écrire le nombre
+        cote_case = Case.TAILLE  # Taille en pixels de la case
+        taille_police = int(Case.TAILLE/10.0+8)  # Taille de la police
         for i in range(cote_grille):
             x = x_0+i*cote_case+cote_case/2.0
             y = y_0+cote_case+decimales_max*taille_police/2.0
@@ -136,7 +151,7 @@ class Tortue(turtle.Turtle):
         self.fillcolor(self.couleur_case(case.etat))
         points = case.carre()
         self.up()
-        self.goto(points[0])
+        self.goto(points[0])  # Va au point inférieur droite de la case
         self.down()
         self.begin_fill()
         for i in range(1, len(points)):  # la tortue est déjà à "points[0]", donc on commence à 1
@@ -144,7 +159,7 @@ class Tortue(turtle.Turtle):
         self.goto(points[0])
         self.end_fill()
 
-    def dessiner_grille(self, cases):
+    def dessiner_grille(self, cases):  # TODO: ajuster taille cases dynamiquement
         """
         Dessine la grille.
 
@@ -159,40 +174,50 @@ class Tortue(turtle.Turtle):
         self.screen.update()
 
 
-class Afficheur:
+class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, afficher bateaux restants et coulés
     """
     Cette classe permet de dessiner les objets à l'écran. Elle utilise un objet "Tortue" ou la console pour dessiner à l'écran.
     """
     NOMBRE_DE_COUPS_MAX = 50
+    TEMPS_MAX = 120  # TODO: implémenter contrainte de temps
     def __init__(self, grille):
         """
-        constructeur de la classe "Stylo"
+        constructeur de la classe "Afficheur"
 
         :param grille: grille de jeu à afficher
         """
         self.grille = grille
         self.tortue = Tortue()
-        self._nombre_de_coups = 0
+        self.nombre_de_coups = 0
 
     def coups_restants(self):
-        return self.NOMBRE_DE_COUPS_MAX-self._nombre_de_coups
+        """
+        Retourne le nombre de coups restants
 
-    def rejouer(self):
-        self._nombre_de_coups = 0
-        import time
-        a = time.time()
-        self.grille.placer_bateaux()
-        b = time.time()
-        self.dessiner_tout()
-        print(str(b-a))
+        :return: nombre de coups restants
+        """
+        return self.NOMBRE_DE_COUPS_MAX-self.nombre_de_coups
 
-    def sur_coup_joue(self):
-        self._nombre_de_coups += 1
+    def joueur_a_perdu(self):  # TODO: ajouter autres contraintes
+        """
+        Détermine si le joueur a perdu
 
-    def joueur_a_perdu(self):
+        :return: Booléen indiquant si le joueur a perdu
+        """
         if self.coups_restants() <= 0:
             return True
         return False
+
+    def joueur_a_gagne(self):
+        """
+        Détermine si le joueur a gagné
+
+        :return: Booléen indiquant si le joueur a gagné
+        """
+        for bateau in self.grille.bateaux:
+            if not bateau.est_coule():
+                return False
+        return True
 
     def afficher(self, message, fin="\n"):
         """
@@ -203,11 +228,22 @@ class Afficheur:
         :return:
         """
         print(message, end=fin)
-        self.tortue.afficher_message(message+fin, (0, self.grille.TAILLE*Case.TAILLE))
+        self.tortue.afficher_message(message+fin, (0, -(self.grille.TAILLE+4)*Case.TAILLE/2.0), alignement="center")
+
+    def afficher_coups_restants(self):
+        self.afficher("Coups restants : " + str(self.coups_restants()))
+
+    def afficher_erreur(self):
+        """
+        Indique à l'utilisateur qu'une erreur s'est produite.
+
+        :return: "None"
+        """
+        self.afficher("Une erreur s'est produite.")
 
     def recevoir_entree(self, texte_a_afficher=""):
         """
-        Fonction équivalente à "raw_input()", mais compatible avec python 3 et avec la tortue
+        Fonction équivalente à "raw_input()", mais compatible avec python 3
 
         :param texte_a_afficher: texte aà afficher avant de recevoir l'entrée de l'utilisateur
         :return: texte entré par l'utilisateur
@@ -227,14 +263,6 @@ class Afficheur:
         if entree in ("oui", "o"):
             return True
         return False
-
-    def afficher_erreur(self):
-        """
-        Indique à l'utilisateur qu'une erreur s'est produite.
-
-        :return: "None"
-        """
-        self.afficher("Une erreur s'est produite.")
 
     def confirmer_quitter(self):
         """
@@ -258,6 +286,18 @@ class Afficheur:
                 return False
             else:
                 self.afficher("Erreur, entrée invalide")
+
+    def rejouer(self):
+        """
+        Démarre une nouvelle partie
+
+        :return: "None"
+        """
+        self.nombre_de_coups = 0
+        if not self.grille.placer_bateaux():
+            self.afficher("Impossible de placer les bateaux, la grille est peut-être trop petite par rapport au nombre de bateaux.")
+            exit(1)  # TODO: éventuellement changer le comportement en cas d'erreur
+        self.dessiner_tout()
 
     def dessiner_tout(self):
         """
@@ -324,7 +364,7 @@ class Afficheur:
         if index_x == self.grille.TAILLE-1:
             print("|\n", end="")
 
-    def dessiner_grille_console(self):
+    def dessiner_grille_console(self):  # TODO: faire en sorte de pouvoir actualiser la grille sans l'afficher plusieurs fois
         """
         Dessine la grille dans la console.
 
@@ -365,20 +405,6 @@ class Afficheur:
         else:
             _ = os.system("clear")  # Idem
 
-    def afficher_coups_restants(self):
-        print("Coups restants : " + str(self.coups_restants()))
-
-    def joueur_a_gagne(self):
-        """
-        Détermine si le joueur a gagné
-
-        :return: Booléen indiquant si le joueur a gagné
-        """
-        for bateau in self.grille.bateaux:
-            if not bateau.est_coule():
-                return False
-        return True
-
     def tirer(self, coordonnees):
         """
         Tire sur une case en utilisant la fonction correspondant au mode
@@ -406,7 +432,7 @@ class Afficheur:
                 type = cases[0].bateau().TYPE  # On récupère le type du bateau touché
                 type = type[0].upper() + type[1:len(type)]  # On met la première lettre en majuscules
                 self.afficher(type + " coulé")
-            self.sur_coup_joue()
+            self.nombre_de_coups += 1
         else:
             self.afficher_erreur()
 
@@ -437,9 +463,6 @@ class Afficheur:
                 if self.demander_rejouer():
                     self.rejouer()
         return continuer
-
-
-
 
     def boucle_des_evenements(self):
         """

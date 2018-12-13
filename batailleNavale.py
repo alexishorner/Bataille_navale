@@ -14,6 +14,7 @@ NOMBRE_PORTES_AVIONS = 1
 def creer_bateau(classe, nombre):
     """
     Ajoute des bateaux d'un certain type à une liste
+
     :param classe: Classe des bateaux à créer
     :param nombre: Nombre de bateaux à créer
     :param liste: Liste où stocker les bateaux
