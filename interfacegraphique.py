@@ -312,7 +312,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         position = (0, self.grille.position_coins()[1][1]-25)  # On place en bas au milieu de la grille
         self.tortue.afficher_message(message, position, alignement="center", police=("Arial", 8, "bold"))
 
-    def afficher_parametres(self, partie_en_cours=False):  # TODO: ajouter paramètre taille grille
+    def afficher_parametres(self, partie_en_cours=False):  # TODO: ajouter paramètre taille grille et améliorer alignement texte
         titre = "Paramètres"
         texte = ["1. Difficulté : {0}".format(self.chaine_difficulte()),
                  "2. Nombre maximum de coups : {0}".format(self.nombre_de_coups_maximum(chaine=True)),
