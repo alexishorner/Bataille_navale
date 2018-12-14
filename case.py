@@ -241,6 +241,17 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
         coin_superieur_droit = self.cases[0][self.taille-1].carre()[2]
         return coin_superieur_gauche, coin_inferieur_gauche, coin_inferieur_droit, coin_inferieur_droit
 
+    def nombre_de_cases_occupees(self):
+        """
+        Renvoie le nombre de cases occupées par un bateau
+
+        :return: nombre de cases occupées
+        """
+        nombre_de_cases_occupees = 0
+        for bateau in self.bateaux:
+            nombre_de_cases_occupees += bateau.TAILLE
+        return nombre_de_cases_occupees
+
     def bateaux_restants(self):
         """
         Renvoie les bateaux non coulés

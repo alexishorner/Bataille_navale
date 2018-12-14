@@ -42,6 +42,13 @@ class Mode(IntEnum):
     """
     CONSOLE, TORTUE = range(2)
 
+@unique
+class Difficulte(IntEnum):
+    """
+    Énumération décrivant les différentes difficultés.
+    """
+    FACILE, MOYEN, DIFFICILE = range(3)
+
 
 class Tortue(turtle.Turtle):
     """
@@ -93,7 +100,7 @@ class Tortue(turtle.Turtle):
             self.goto(x)
         else:
             self.goto(x, y)
-            self.down()
+        self.down()
 
     def _effacer_ancien_message(self):
         self._ecrire(self.ancien_message, self.ancienne_position, self.ancien_alignement, self.ancienne_police, self.COULEUR_ARRIERE_PLAN)
@@ -189,7 +196,6 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
     """
     Cette classe permet de dessiner les objets à l'écran. Elle utilise un objet "Tortue" ou la console pour dessiner à l'écran.
     """
-    TEMPS_MAX = 120  # TODO: implémenter contrainte de temps
     
     def __init__(self, grille):
         """
@@ -197,17 +203,49 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
 
         :param grille: grille de jeu à afficher
         """
+        self.difficulte = Difficulte.MOYEN  # TODO: implémenter difficulté
+        self._parametre_nombre_de_coups_maximum = "auto"
+        self.temps_par_coup = 5
+        self._parametre_temps_maximum = "auto"  # TODO: implémenter contrainte de temps
         self.grille = grille
         self.tortue = Tortue()
         self.nombre_de_coups = 0
-        
-    def nombre_de_coups_max(self):
+
+    def chaine_difficulte(self):
         """
-        Renvoie le nombre de coups en fonction du nombre de cases dans la grille.
-        
-        :return: nombre de cases divisé par 2
+        Renvoie une chaîne de caractères décrivant la difficulté.
+
+        :return: chaîne de caractères décrivant la difficulté
         """
-        return int(round(self.grille.taille**2/2.0))
+        if self.difficulte == Difficulte.FACILE:
+            return "facile"
+        elif self.difficulte == Difficulte.MOYEN:
+            return "moyen"
+        else:
+            return "difficile"
+        
+    def generer_nombre_de_coups_maximum(self):
+        """
+        Génère automatiquement une valeur pour le nombre de coups maximum en fonction de la difficulté
+        
+        :return: nombre maximum de coups
+        """
+        return int(round(self.grille.taille**2/2.0*(1-self.difficulte/10.0)))
+
+    def nombre_de_coups_maximum(self, chaine=False):  # TODO: prendre en compte les bateaux
+        """
+        Retourne le nombre maximal de coups.
+
+        :return: nombre maximal de coups
+        """
+        if self._parametre_nombre_de_coups_maximum == "auto":
+            nombre_de_coups_maximum = self.generer_nombre_de_coups_maximum()
+            if chaine:
+                return self._parametre_temps_maximum + " ({0})".format(nombre_de_coups_maximum)
+            return nombre_de_coups_maximum
+        if chaine:
+            return str(self._parametre_nombre_de_coups_maximum)
+        return self._parametre_nombre_de_coups_maximum
 
     def coups_restants(self):
         """
@@ -215,7 +253,31 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
 
         :return: nombre de coups restants
         """
-        return self.nombre_de_coups_max()-self.nombre_de_coups
+        return self.nombre_de_coups_maximum() - self.nombre_de_coups
+
+    def generer_temps_maximum(self):
+        """
+        Génère automatiquement une valeur pour le temps maximum en fonction de la difficulté
+
+        :return: temps maximum
+        """
+        return int(round(self.nombre_de_coups_maximum() * self.temps_par_coup * (1 - self.difficulte / 10.0)))
+
+    def temps_maximum(self, chaine=False):
+        """
+        Retourne le temps maximal par partie.
+
+        :param chaine: spécifie si le retour doit être une chaîne de caractères
+        :return: temps maximal
+        """
+        if self._parametre_temps_maximum == "auto":
+            temps_maximum = self.generer_temps_maximum()
+            if chaine:
+                return self._parametre_temps_maximum + " ({0} s)".format(temps_maximum)
+            return temps_maximum
+        if chaine:
+            return "{0} s".format(self._parametre_temps_maximum)
+        return self._parametre_temps_maximum
 
     def joueur_a_perdu(self):  # TODO: ajouter autres contraintes
         """
@@ -244,28 +306,174 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
 
         :param message: message à afficher
         :param fin: caractère à placer dans la console après le message
-        :return:
+        :return: "None"
         """
         print(message, end=fin)
         position = (0, self.grille.position_coins()[1][1]-25)  # On place en bas au milieu de la grille
         self.tortue.afficher_message(message, position, alignement="center", police=("Arial", 8, "bold"))
 
-    def afficher_menu(self):
+    def afficher_parametres(self, partie_en_cours=False):  # TODO: ajouter paramètre taille grille
+        titre = "Paramètres"
+        texte = ["1. Difficulté : {0}".format(self.chaine_difficulte()),
+                 "2. Nombre maximum de coups : {0}".format(self.nombre_de_coups_maximum(chaine=True)),
+                 "3. Temps maximum : {0}".format(self.temps_maximum(chaine=True))]
+        nombre_caracteres_max = len(max(texte, key=len))
+        caracteres_a_ajouter = nombre_caracteres_max-len(titre)
+        titre = " "*int(math.ceil(caracteres_a_ajouter/2.0)) + titre + " "*int(math.floor(caracteres_a_ajouter/2.0))
+        recommencer = True
+        while recommencer:
+            recommencer = False
+            self.tortue.clear()
+            x, y = 0, 40
+            print("\n"+titre)
+            self.tortue._ecrire(titre, (0, y), alignement="center", police=("Arial", 12, "bold"))
+            for i, ligne in enumerate(texte):
+                print(ligne)
+                self.tortue._ecrire(ligne, (0, y-40-i*20), alignement="center", police=("Arial", 12, "normal"))
+            entree = chaine_nettoyee(self.recevoir_entree(">>> "))
+            if entree in ("", "<"):
+                self.afficher_menu(partie_en_cours=partie_en_cours)
+                return
+            else:
+                try:
+                    entree = int(float(entree))
+                except ValueError:
+                    self.afficher_erreur()
+                    recommencer = True
+                    continue
+
+                if entree in range(1, len(texte)+1):
+                    recommencer2 = True
+                    while recommencer2:
+                        recommencer2 = False
+                        if entree == 1:  # "Difficulté"
+                            nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("Nouvelle valeur (1. facile, 2. moyen, 3. difficile) : "))
+                            if nouvelle_valeur in ("a", "auto"):
+                                print("La difficulté ne peut pas être automatique")
+                                recommencer2 = True
+                                continue
+                            elif nouvelle_valeur in ("1", "1.", "f", "facile"):
+                                self.difficulte = Difficulte.FACILE
+                            elif nouvelle_valeur in ("2", "2.", "m", "moyen"):
+                                self.difficulte = Difficulte.MOYEN
+                            elif nouvelle_valeur in ("3", "3.", "d", "difficile"):
+                                self.difficulte = Difficulte.DIFFICILE
+                            else:
+                                self.afficher_erreur()
+                                recommencer2 = True
+                                continue
+                            print("Difficulté changée à {0}".format(self.chaine_difficulte()))
+                        elif entree in (2, 3):  # "Nombre maximum de coups" ou "Temps maximum"
+                            nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("Nouvelle valeur (auto, 1, 2, 3, ...) : "))
+                            if entree == 2:  # "Nombre maximum de coups"
+                                if nouvelle_valeur in ("a", "auto"):
+                                    self._parametre_nombre_de_coups_maximum = "auto"
+                                    print("Nombre de coups maximum changé à {0}".format(self.nombre_de_coups_maximum(chaine=True)))
+                                else:
+                                    try:
+                                        nouvelle_valeur = int(float(nouvelle_valeur))
+                                    except ValueError:
+                                        self.afficher_erreur()
+                                        recommencer2 = True
+                                        continue
+                                    if nouvelle_valeur >= self.grille.nombre_de_cases_occupees():  # On veut que le nombre
+                                                                                                   # de coups soit au moins
+                                                                                                   # égal au nombre de cases occupées
+                                        self._parametre_nombre_de_coups_maximum = nouvelle_valeur  # TODO: vérifier quand partie est en cours
+                                        print("Nombre de coups maximum changé à {0}".format(self.nombre_de_coups_maximum(chaine=True)))
+                                    else:
+                                        print("Nombre de coups insuffisant.")
+                                        recommencer2 = True
+                                        continue
+                            else:  # "Temps maximum"
+                                if nouvelle_valeur in ("a", "auto"):
+                                    self._parametre_temps_maximum = "auto"
+                                else:
+                                    try:
+                                        nouvelle_valeur = int(float(nouvelle_valeur))
+                                    except ValueError:
+                                        self.afficher_erreur()
+                                        recommencer2 = True
+                                        continue
+                                    if nouvelle_valeur > 0:
+                                        self._parametre_temps_maximum = nouvelle_valeur
+                                    else:
+                                        print("Temps insuffisant.")
+                                        recommencer2 = True
+                                        continue
+                else:
+                    self.afficher_erreur()
+                    recommencer = True
+                    continue
+        self.afficher_parametres(partie_en_cours=partie_en_cours)
+
+    def afficher_menu(self, partie_en_cours=False):
         """
         Affiche le menu.
 
         :return: "None"
         """
         titre = "       Menu       "
-        texte = ["1.  Nouvelle partie",
-                 "2.  Paramètres     ",
-                 "3.  Quitter        "]
+        texte = []
+        if partie_en_cours:
+            texte.append("Continuer      ")
+        texte.extend(("Nouvelle partie",
+                      "Paramètres     ",
+                      "Quitter        "))
+        for i in range(len(texte)):
+            texte[i] = str(i+1) + ".  " + texte[i]  # On ajoute un numéro devant chaque élément du menu
         x, y = 0, 40
-        print(titre)
-        self.tortue._ecrire(titre, (x, y), alignement="center", police=("Arial", 12, "bold"))
-        for i, ligne in enumerate(texte):
-            print(ligne)
-            self.tortue._ecrire(ligne, (x, y-40-i*20), alignement="center", police=("Arial", 12, "normal"))
+        entree = ""
+        recommencer = True
+        while recommencer:
+            recommencer = False
+            self.tortue.clear()  # On efface l'écran
+            print("\n"+titre)
+            self.tortue._ecrire(titre, (x, y), alignement="center", police=("Arial", 12, "bold"))
+            for i, ligne in enumerate(texte):
+                print(ligne)
+                self.tortue._ecrire(ligne, (x, y-40-i*20), alignement="center", police=("Arial", 12, "normal"))
+            entree = chaine_nettoyee(self.recevoir_entree(">>> "))
+            if entree in ("", "<"):  # Si l'entrée est revenir en arrière
+                if partie_en_cours:
+                    self.dessiner_tout()  # On continue la partie
+                else:
+                    print("Vous ne pouvez pas revenir en arrière ici.")
+                    recommencer = True
+                    continue
+            else:
+                try:
+                    entree = int(entree)  # On convertit l'entrée en nombres, si ça ne marche pas, on affiche une erreur
+                except ValueError:
+                    self.afficher_erreur()  # On affiche une erreur et on recommence
+                    recommencer = True
+                    continue
+
+                if partie_en_cours:  # Si on a rajouté une ligne au début, on enlève 1 à "entree" pour avoir moins de conditions
+                    entree -= 1
+                if entree == 0:  # "Continuer"
+                    self.dessiner_tout()
+                elif entree == 1:  # "Recommencer"
+                    if partie_en_cours:
+                        if self.confirmer_question("Êtes-vous sûr(e) de vouloir recommencer? Votre partie n'est pas finie. o/n"):
+                            self.rejouer()
+                        else:
+                            recommencer = True
+                            continue  # On recommence la boucle
+                elif entree == 2:  # "Paramètres"
+                    self.afficher_parametres(partie_en_cours=partie_en_cours)
+                    return
+                elif entree == 3:  # "Quitter"
+                    if self.confirmer_quitter():
+                        exit(0)
+                    else:
+                        recommencer = True
+                        continue
+                else:  # Erreur
+                    self.afficher_erreur()
+                    recommencer = True
+                    continue
+
 
     def afficher_coups_restants(self):
         """
@@ -486,9 +694,13 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         :param entree: entrée de l'utilisateur dans la console
         :return: booléen indiquant si le jeu doit continuer
         """
-        continuer = True
         if chaine_nettoyee(entree) in ("quitter", "q"):  # Si l'utilisateur veut quitter
-            continuer = not self.confirmer_quitter()
+            if self.confirmer_quitter():
+                exit(0)
+        elif chaine_nettoyee(entree) in ("menu", "m"):
+            self.afficher_menu(partie_en_cours=True)
+        elif chaine_nettoyee(entree) in ("parametres", "paramÈtres", "paramètres", "p"):
+            self.afficher_parametres(partie_en_cours=True)
         else:
             retour, cases = self.grille.tirer(entree)  # On tire sur la case et on enregistre le retour de la méthode
             self.afficher_retour_tir(retour, cases)  # TODO: continuer
@@ -496,15 +708,14 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
 
             if self.joueur_a_gagne():
                 print("Vous avez gagné, bravo!")
-                rejouer = self.demander_rejouer()
-                continuer = rejouer
-                if rejouer:
+                if self.demander_rejouer():
                     self.rejouer()
+                else:
+                    self.afficher_menu()
             elif self.joueur_a_perdu():
                 print("Vous avez perdu!")
                 if self.demander_rejouer():
                     self.rejouer()
-        return continuer
 
     def boucle_des_evenements(self):
         """
@@ -514,12 +725,11 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         :return: "None"
         """
         self.rejouer()
-        continuer = True
-        while continuer:
+        while True:
             entree = self.recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
             #entree = string.ascii_uppercase[random.randint(0, self.grille.largeur_pixels)] + str(random.randint(0, self.grille.largeur_pixels))
             # TODO: enlever ligne de test
-            continuer = self.avancer_d_un_tour(entree)
+            self.avancer_d_un_tour(entree)
 
 
 
