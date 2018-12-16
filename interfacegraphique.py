@@ -118,11 +118,10 @@ class Tortue(turtle.Turtle):
         self.pencolor(ancienne_couleur)  # Rétablit la couleur de la tortue
         
     def dessinfond(self):
-        self.hideturtle()
-        self.up()
-        self.begin_fill()
         self.fillcolor(self.COULEUR_FOND)
-        self.goto(-4000, -4000)  # On prend large pour être sûr de remplir l'écran
+        self.setheading(0)
+        self.begin_fill()
+        self.aller_a(-4000, -4000)  # On prend large pour être sûr de remplir l'écran
         for i in range(4):
             self.forward(8000)
             self.left(90)
@@ -130,42 +129,73 @@ class Tortue(turtle.Turtle):
         self.screen.update()
 
     def dessincale(self, bateau):
-        origine = self.pos()
+        """
+        alpha -> \------------/ <- beta
+                  \__________/
+        :param bateau: bateau dont il faut dessiner la cale
+        :return: pas de retour
+        """
+        alpha = 85
+        beta = 60
+        longueur = 30*bateau.TAILLE
+        hauteur = 20
         self.pensize(2)
         self.fillcolor(self.COULEUR_CALE)
-        self.begin_fill()  # cale
-        self.right(26.56)
-        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels) / math.sqrt(2))
-        self.left(26.56)
-        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels))
-        self.left(26.56)
-        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels) / math.sqrt(2))
-        self.left(153.44)
+        self.begin_fill()
+        self.right(alpha)
+        self.forward(hauteur/math.sin(math.radians(alpha)))
+        self.left(alpha)
+        self.forward(longueur-hauteur/math.tan(math.radians(alpha))-hauteur/math.tan(math.radians(beta)))
+        self.left(beta)
+        self.forward(hauteur/math.sin(math.radians(beta)))
+        self.left(180-beta)
         pos = self.pos()
-        self.goto(origine)
+        self.forward(longueur)
+        print(str(math.sqrt((self.xcor()-pos[0])**2+(self.ycor()-pos[1])**2)))
         self.end_fill()
         self.up()
         self.goto(pos)
         self.down()
 
-    def dessincheminee(self, bateau):
+    def dessintourelle(self):  # TODO: finir de dessiner la tourelle
+        hauteur = 10
+        largeur = 18
+        alpha = 70
+        beta = 80
+        #self.showturtle()  #
+        #self.tracer(1, 0)  # NOTE : Décommenter ces deux lignes pour voir le chemin de la tortue
+        self.fillcolor("grey")
+        self.begin_fill()
+        self.speed(0)
+        self.forward(largeur)
+        self.left(180-alpha)
+        self.forward(hauteur/math.sin(math.radians(alpha)))
+        self.left(alpha)
+        self.forward(largeur - hauteur/math.tan(math.radians(alpha)) - hauteur/math.tan(math.radians(beta)))
+        self.left(beta)
+        self.forward(hauteur/math.sin(math.radians(beta)))
+        self.end_fill()
+
+    def dessincheminee(self, bateau):  # TODO: corriger méthode
+        largeur = 10
         origine = self.pos()
         self.setheading(90)
         self.pensize(1)
         self.fillcolor(self.COULEUR_CHEMINEE)
         self.begin_fill()
-        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels / 3))
+        self.forward((bateau.TAILLE - 1) * int(largeur / 3.0))
         self.left(90)
-        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels / 6))
+        self.forward((bateau.TAILLE - 1) * int(largeur / 6.0))
         self.left(90)
-        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels / 3))
+        self.forward((bateau.TAILLE - 1) * int(largeur / 3.0))
         self.right(90)
         self.goto(origine)
         self.end_fill()
         self.setheading(180)
 
-    def dessinbateaux(self, grille, position):
+    def dessinbateaux(self, grille, position):  # TODO: ajouter des tourelles et ne garder qu'une cheminée
         """Dessine les bateaux stylisés"""
+        largeur = 10
         bateaux_par_type = []  # liste stockant un bateau par type
         for bateau in grille.bateaux:
             type_dans_liste = False  # Est-ce que le type du bateau est déjà compté?
@@ -177,17 +207,17 @@ class Tortue(turtle.Turtle):
 
         for i, bateau in enumerate(bateaux_par_type):
             self.up()
-            self.goto(position[0], position[1] + i* 94)
+            self.goto(position[0], position[1] + i*94)
             self.down()
             self.setheading(0)
             self.dessincale(bateau)
-            self.forward(abs((bateau.TAILLE - 1) * int(Case.largeur_pixels) / math.sqrt(2)))
+            self.forward(abs((bateau.TAILLE - 1) * largeur / math.sqrt(2)))
             for i in range(3):  # On dessine trois cheminées
                 self.dessincheminee(bateau)
                 if i < 2:
-                    self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels / 3))
+                    self.forward((bateau.TAILLE - 1) * int(largeur / 3.0))
             self.up()
-            self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels) * 2)
+            self.forward((bateau.TAILLE - 1) * largeur * 2)
             self.down()
             self.write(" X = " + str(grille.nombrebateauxdeboutpartype(bateau.TYPE)))
             self.screen.update()
@@ -254,50 +284,61 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         :param grille: grille de jeu à afficher
         """
         self.difficulte = Difficulte.MOYEN  # TODO: implémenter difficulté
+        self._nouvelle_difficulte = self.difficulte
         self._parametre_nombre_de_coups_maximum = "auto"
+        self._nouveau_parametre_nombre_de_coups_maximum = self._parametre_nombre_de_coups_maximum
         self.temps_par_coup = 5
         self._parametre_temps_maximum = "auto"  # TODO: implémenter contrainte de temps
+        self._nouveau_parametre_temps_maximum = self._parametre_temps_maximum
         self.grille = grille
+        self._nouvelle_taille_grille = grille.taille()
         self.tortue_elements_permanents = Tortue()  # Tortue dessinant les éléments restants plusieurs tours d'affilée
         self.tortue_elements_provisoires = Tortue()  # Tortue dessinant les éléments changés à chaque tour
         self.nombre_de_coups = 0
         self.temps_depart = 0
 
-    def chaine_difficulte(self):
+    def chaine_nouvelle_difficulte(self):
         """
-        Renvoie une chaîne de caractères décrivant la difficulté.
+        Renvoie une chaîne de caractères décrivant le dernier paramètre de difficulté.
 
         :return: chaîne de caractères décrivant la difficulté
         """
-        if self.difficulte == Difficulte.FACILE:
+        if self._nouvelle_difficulte == Difficulte.FACILE:
             return "facile"
-        elif self.difficulte == Difficulte.MOYEN:
+        elif self._nouvelle_difficulte == Difficulte.MOYEN:
             return "moyen"
         else:
             return "difficile"
         
-    def generer_nombre_de_coups_maximum(self):
+    def generer_nombre_de_coups_maximum(self, taille_grille=None, difficulte=None):
         """
         Génère automatiquement une valeur pour le nombre de coups maximum en fonction de la difficulté
         
         :return: nombre maximum de coups
         """
-        return int(round(self.grille.taille**2/2.0*(1-self.difficulte/10.0)))
+        _taille_grille = taille_grille
+        _difficulte = difficulte
+        if taille_grille is None:
+            _taille_grille = self.grille.taille()
+            if difficulte is None:
+                _difficulte = self.difficulte
+        return int(round(_taille_grille**2/2.0*(1-_difficulte/10.0)))
 
-    def nombre_de_coups_maximum(self, chaine=False):  # TODO: prendre en compte les bateaux
+    def nombre_de_coups_maximum(self, taille_grille=None, difficulte=None):  # TODO: prendre en compte les bateaux
         """
         Retourne le nombre maximal de coups.
 
         :return: nombre maximal de coups
         """
         if self._parametre_nombre_de_coups_maximum == "auto":
-            nombre_de_coups_maximum = self.generer_nombre_de_coups_maximum()
-            if chaine:
-                return self._parametre_temps_maximum + " ({0})".format(nombre_de_coups_maximum)
+            nombre_de_coups_maximum = self.generer_nombre_de_coups_maximum(taille_grille, difficulte)
             return nombre_de_coups_maximum
-        if chaine:
-            return str(self._parametre_nombre_de_coups_maximum)
         return self._parametre_nombre_de_coups_maximum
+
+    def chaine_nouveau_nombre_de_coups_maximum(self):
+        if self._nouveau_parametre_nombre_de_coups_maximum == "auto":
+            return "auto ({0})".format(self.nombre_de_coups_maximum(self._nouvelle_taille_grille, self._nouvelle_difficulte))
+        return str(self._nouveau_parametre_nombre_de_coups_maximum)
 
     def coups_restants(self):
         """
@@ -307,29 +348,33 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         """
         return self.nombre_de_coups_maximum() - self.nombre_de_coups
 
-    def generer_temps_maximum(self):
+    def generer_temps_maximum(self, taille_grille=None, difficulte=None):
         """
         Génère automatiquement une valeur pour le temps maximum en fonction de la difficulté
 
         :return: temps maximum
         """
-        return int(round(self.nombre_de_coups_maximum() * self.temps_par_coup * (1 - self.difficulte / 10.0)))
+        nombre_de_coups_maximum = self.nombre_de_coups_maximum(taille_grille, difficulte)
+        _difficulte = difficulte
+        if difficulte is None:
+            _difficulte = self.difficulte
 
-    def temps_maximum(self, chaine=False):
+        return int(round(nombre_de_coups_maximum * self.temps_par_coup * (1 - _difficulte/10.0)))
+
+    def temps_maximum(self):
         """
         Retourne le temps maximal par partie.
 
-        :param chaine: spécifie si le retour doit être une chaîne de caractères
         :return: temps maximal
         """
         if self._parametre_temps_maximum == "auto":
-            temps_maximum = self.generer_temps_maximum()
-            if chaine:
-                return self._parametre_temps_maximum + " ({0} s)".format(temps_maximum)
-            return temps_maximum
-        if chaine:
-            return "{0} s".format(self._parametre_temps_maximum)
+            return self.generer_temps_maximum()
         return self._parametre_temps_maximum
+
+    def chaine_nouveau_parametre_temps_maximum(self):
+        if self._nouveau_parametre_temps_maximum == "auto":
+            return "auto ({0} s)".format(self.generer_temps_maximum(self._nouvelle_taille_grille, self._nouvelle_difficulte))
+        return self._nouveau_parametre_temps_maximum
 
     def temps_restant(self):
         return self.temps_maximum()-(time.time() - self.temps_depart)
@@ -375,9 +420,10 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
 
     def afficher_parametres(self, partie_en_cours=False):  # TODO: ajouter paramètre taille grille et améliorer alignement texte
         titre = "Paramètres"
-        texte = ["1. Difficulté : {0}".format(self.chaine_difficulte()),
-                 "2. Nombre maximum de coups : {0}".format(self.nombre_de_coups_maximum(chaine=True)),
-                 "3. Temps maximum : {0}".format(self.temps_maximum(chaine=True))]
+        texte = ["1. Difficulté : {0}".format(self.chaine_nouvelle_difficulte()),
+                 "2. Nombre maximum de coups : {0}".format(self.chaine_nouveau_nombre_de_coups_maximum()),
+                 "3. Temps maximum : {0}".format(self.chaine_nouveau_parametre_temps_maximum()),
+                 "4. Taille grille : {0}".format(self._nouvelle_taille_grille)]
         nombre_caracteres_max = len(max(texte, key=len))
         caracteres_a_ajouter = nombre_caracteres_max-len(titre)
         titre = " "*int(math.ceil(caracteres_a_ajouter/2.0)) + titre + " "*int(math.floor(caracteres_a_ajouter/2.0))
@@ -416,17 +462,17 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                                 print("La difficulté ne peut pas être automatique")
                                 recommencer2 = True
                                 continue
-                            elif nouvelle_valeur in ("1", "1.", "f", "facile"):
-                                self.difficulte = Difficulte.FACILE
+                            elif nouvelle_valeur in ("1", "1.", "f", "facile"):  # TODO: changer autres paramètres en accord avec la difficulté
+                                self._nouvelle_difficulte = Difficulte.FACILE
                             elif nouvelle_valeur in ("2", "2.", "m", "moyen"):
-                                self.difficulte = Difficulte.MOYEN
+                                self._nouvelle_difficulte = Difficulte.MOYEN
                             elif nouvelle_valeur in ("3", "3.", "d", "difficile"):
-                                self.difficulte = Difficulte.DIFFICILE
+                                self._nouvelle_difficulte = Difficulte.DIFFICILE
                             else:
                                 self.afficher_erreur()
                                 recommencer2 = True
                                 continue
-                            print("Difficulté changée à {0}".format(self.chaine_difficulte()))
+                            print("Difficulté changée à {0}, les modifications prendront effet à la prochaine partie.".format(self.chaine_nouvelle_difficulte()))
                         elif entree == 2:  # "Nombre maximum de coups"
                             min = self.grille.nombre_de_cases_occupees()
                             nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("Nouvelle valeur (auto, {0}, {1}, {2}, ...) : ".format(min, min+1, min+2)))
@@ -434,8 +480,8 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                                 self.afficher_parametres(partie_en_cours=partie_en_cours)
                                 return
                             elif nouvelle_valeur in ("a", "auto"):
-                                self._parametre_nombre_de_coups_maximum = "auto"
-                                print("Nombre de coups maximum changé à {0}".format(self.nombre_de_coups_maximum(chaine=True)))
+                                self._nouveau_parametre_nombre_de_coups_maximum = "auto"
+                                print("Nombre de coups maximum changé à {0}, les modifications prendront effet à la prochaine partie.".format(nouvelle_valeur))
                             else:
                                 try:
                                     nouvelle_valeur = int(float(nouvelle_valeur))
@@ -446,20 +492,21 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                                 if nouvelle_valeur >= self.grille.nombre_de_cases_occupees():  # On veut que le nombre
                                                                                                # de coups soit au moins
                                                                                                # égal au nombre de cases occupées
-                                    self._parametre_nombre_de_coups_maximum = nouvelle_valeur  # TODO: vérifier quand partie est en cours
-                                    print("Nombre de coups maximum changé à {0}".format(self.nombre_de_coups_maximum(chaine=True)))
+                                    self._nouveau_parametre_nombre_de_coups_maximum = nouvelle_valeur  # TODO: vérifier quand partie est en cours
+                                    print("Nombre de coups maximum changé à {0}, les modifications prendront effet à la prochaine partie.".format(nouvelle_valeur))
                                 else:
                                     print("Nombre de coups insuffisant.")
                                     recommencer2 = True
                                     continue
-                        else:  # "Temps maximum"
+                        elif entree == 3:  # "Temps maximum"
                             min = 1
                             nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("Nouvelle valeur (auto, {0}, {1}, {2}, ...) : ".format(min, min+1, min+2)))
                             if nouvelle_valeur in ("", "<"):
                                 self.afficher_parametres(partie_en_cours=partie_en_cours)
                                 return
                             elif nouvelle_valeur in ("a", "auto"):
-                                self._parametre_temps_maximum = "auto"
+                                self._nouveau_parametre_temps_maximum = "auto"
+                                print("Temps réglé de manière automatique ({0} s), les modifications prendront effet à la prochaine partie.".format(self.temps_maximum()))
                             else:
                                 try:
                                     nouvelle_valeur = int(float(nouvelle_valeur))
@@ -468,16 +515,40 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                                     recommencer2 = True
                                     continue
                                 if nouvelle_valeur > 0:
-                                    self._parametre_temps_maximum = nouvelle_valeur
+                                    self._nouveau_parametre_temps_maximum = nouvelle_valeur
+                                    print("Temps maximum changé à {0}, les modifications prendront effet à la prochaine partie.".format(nouvelle_valeur))
                                 else:
                                     print("Temps insuffisant.")
                                     recommencer2 = True
                                     continue
+                        else:  # "Taille grille"
+                            entree = chaine_nettoyee(self.recevoir_entree("\nAvec quelle taille de grille souhaitez-vous jouer? (nombre entre 3 et 26)\n"))
+                            try:  # On teste si la ligne suivante provoque une erreur
+                                entree = int(float(entree))  # Le "float" permet d'accepter des valeurs comme 5.0 ou 2.3e1 (23)
+                            except ValueError:  # Si une erreur de valeur est signalée
+                                print("Erreur, vous devez entrer un nombre")
+                            if entree >= 3 and entree <= 26:
+                                cote = entree
+                                self._nouvelle_taille_grille = cote  # TODO: changer taille grille au début de la partie
+                                print("Taille de la grille changée à {0}, les modifications prendront effet à la prochaine partie.".format(cote))
+                            elif entree < 3:
+                                print ("La grille doit avoir une taille minimum de 3 cases pour pouvoir placer des bateaux")
+                                recommencer2 = True
+                                continue
+                            else:
+                                print ("La grille est trop grande, le maximum est 26")
+                                recommencer2 = True
                 else:
                     self.afficher_erreur()
                     recommencer = True
                     continue
         self.afficher_parametres(partie_en_cours=partie_en_cours)
+
+    def actualiser_parametres(self):
+        self.difficulte = self._nouvelle_difficulte
+        self._parametre_nombre_de_coups_maximum = self._nouveau_parametre_nombre_de_coups_maximum
+        self._parametre_temps_maximum = self._nouveau_parametre_temps_maximum
+        self.grille.set_taille(self._nouvelle_taille_grille)
 
     def afficher_menu(self, partie_en_cours=False):
         """
@@ -621,6 +692,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
 
         :return: "None"
         """
+        self.actualiser_parametres()
         self.nombre_de_coups = 0
         if not self.grille.placer_bateaux():
             self.afficher("Impossible de placer les bateaux, la grille est peut-être trop petite par rapport au nombre de bateaux.")
@@ -666,7 +738,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         :param nombre: nombre qui doit être aligné
         :return: "None"
         """
-        espacement_total = decimales(self.grille.taille)
+        espacement_total = decimales(self.grille.taille())
         if nombre is None:
             espacement = espacement_total
         else:
@@ -681,7 +753,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         :return: "None"
         """
         self.ajouter_espacement_avant()
-        for index_x in range(self.grille.taille):
+        for index_x in range(self.grille.taille()):
             print("_" + string.ascii_uppercase[index_x], end="")
         print("_\n", end="")
 
@@ -696,7 +768,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         case = self.grille.cases[index_y][index_x]
         print("|", end="")
         print(case.caractere_etat(), end="")
-        if index_x == self.grille.taille-1:
+        if index_x == self.grille.taille()-1:
             print("|\n", end="")
 
     def dessiner_grille_console(self):  # TODO: faire en sorte de pouvoir actualiser la grille sans l'afficher plusieurs fois
@@ -717,8 +789,8 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
             10|_|_|_|_|_|_|_|_|_|_|
         :return: "None"
         """
-        for index_y in range(self.grille.taille):
-            for index_x in range(self.grille.taille):
+        for index_y in range(self.grille.taille()):
+            for index_x in range(self.grille.taille()):
                 if index_y == 0 and index_x == 0:
                     self.dessiner_premiere_ligne_console()
 

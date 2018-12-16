@@ -197,20 +197,23 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
     def __init__(self, bateaux, taille=10):
         self.bateaux = bateaux
         self.cases = []
-        self.taille = 0  # On crée la variable "self.taille"
+        self._taille = 0  # On crée la variable "self.taille"
         self.set_taille(taille)  # On change la valeur de "self.taille"
 
     def creer_cases(self):
         self.cases = []
-        Case.largeur_pixels = round(self.LARGEUR_PIXELS_IDEALE / self.taille)  # ajuste la largeur des cases en fonction de la taille de la grille
-        decalage_x = -self.taille * Case.largeur_pixels / 2.0  # décalage permettant de centrer la grille
-        decalage_y = (self.taille - 4) * Case.largeur_pixels / 2.0  # on décale moins, car sinon la grille est trop haute
-        for i in range(self.taille):
+        Case.largeur_pixels = round(self.LARGEUR_PIXELS_IDEALE / self._taille)  # ajuste la largeur des cases en fonction de la taille de la grille
+        decalage_x = -self._taille * Case.largeur_pixels / 2.0  # décalage permettant de centrer la grille
+        decalage_y = (self._taille - 4) * Case.largeur_pixels / 2.0  # on décale moins, car sinon la grille est trop haute
+        for i in range(self._taille):
             ligne = []
-            for j in range(self.taille):
+            for j in range(self._taille):
                 position = (j * Case.largeur_pixels + decalage_x, -i * Case.largeur_pixels + decalage_y)
                 ligne.append(Case(position))
             self.cases.append(ligne)
+
+    def taille(self):
+        return self._taille
 
     def set_taille(self, taille):
         """
@@ -220,10 +223,10 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
         :return:
         """
         if taille <= self.TAILLE_MAX:
-            self.taille = taille
+            self._taille = taille
         else:
-            self.taille = self.TAILLE_MAX
-        self.taille = taille
+            self._taille = self.TAILLE_MAX
+        self._taille = taille
         self.creer_cases()
 
     def largeur_pixels(self):
@@ -232,13 +235,13 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
 
         :return: largeur de la grille en pixels
         """
-        return self.taille * Case.largeur_pixels
+        return self._taille * Case.largeur_pixels
 
     def position_coins(self):
         coin_superieur_gauche = self.cases[0][0].carre()[3]
-        coin_inferieur_gauche = self.cases[self.taille-1][0].carre()[0]
-        coin_inferieur_droit = self.cases[self.taille-1][self.taille-1].carre()[1]
-        coin_superieur_droit = self.cases[0][self.taille-1].carre()[2]
+        coin_inferieur_gauche = self.cases[self._taille - 1][0].carre()[0]
+        coin_inferieur_droit = self.cases[self._taille - 1][self._taille - 1].carre()[1]
+        coin_superieur_droit = self.cases[0][self._taille - 1].carre()[2]
         return coin_superieur_gauche, coin_inferieur_gauche, coin_inferieur_droit, coin_inferieur_droit
 
     def nombre_de_cases_occupees(self):
@@ -313,7 +316,7 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
             recommencer = True
             while recommencer and time.time()-temps_depart < 1:  # Cette boucle se répète tant qu'on a pas réussi a placer le bateau
                 cases_bateau = []
-                index_premiere_case = (random.randint(0, self.taille - 1), random.randint(0, self.taille - 1))
+                index_premiere_case = (random.randint(0, self._taille - 1), random.randint(0, self._taille - 1))
                 sens_vertical = random.choice((0, 0, -1, 1))  # Variable déterminant dans quel sens on cherche les cases horizontalement
                 if sens_vertical == 0:  # Si on cherche les cases verticalement
                     sens_horizontal = random.choice((-1, 1))  # on détermine si on cherche vers la gauche ou la droite
@@ -321,8 +324,8 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
                     sens_horizontal = 0  # La valeur 0 empêche de chercher horizontalement
                 index_derniere_case = (index_premiere_case[Coord.y] + sens_vertical*bateau.TAILLE,
                                        index_premiere_case[Coord.x] + sens_horizontal*bateau.TAILLE)
-                if (index_derniere_case[Coord.y] in range(self.taille) and
-                    index_derniere_case[Coord.x] in range(self.taille)):  # Si la dernière case est dans la grille
+                if (index_derniere_case[Coord.y] in range(self._taille) and
+                    index_derniere_case[Coord.x] in range(self._taille)):  # Si la dernière case est dans la grille
                     for i in range(bateau.TAILLE):
                         index_y = index_premiere_case[Coord.y]+i*sens_vertical
                         index_x = index_premiere_case[Coord.x]+i*sens_horizontal
@@ -363,7 +366,7 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
             y = int(copie_coordonnees) - 1
         except ValueError:  # Si on arrive pas à convertir x ou y en nombres
             return False
-        if x in range(self.taille) and y in range(self.taille):
+        if x in range(self._taille) and y in range(self._taille):
             return x, y
         return False
 
@@ -390,7 +393,7 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
             if len(coordonnees) == 2:
                 for coordonnee in coordonnees:
                     if (type(coordonnee) is not int and type(coordonnees) is not float # Si le type des coordonnées n'est pas un nombre
-                    or coordonnee not in range(self.taille)):  # ou si les coordonnées n'ont pas la bonne valeur
+                    or coordonnee not in range(self._taille)):  # ou si les coordonnées n'ont pas la bonne valeur
                         return False
                     return True
         return False  # Si une des conditions plus haut n'est pas satisfaite, on renvoie "False"
