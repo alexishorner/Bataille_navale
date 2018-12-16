@@ -176,7 +176,7 @@ class Tortue(turtle.Turtle):
         self.forward(hauteur/math.sin(math.radians(beta)))
         self.end_fill()
 
-    def dessincheminee(self, bateau):  # TODO: corriger méthode
+    def dessincheminee(self, bateau):
         largeur = 10
         origine = self.pos()
         self.setheading(90)
@@ -193,7 +193,9 @@ class Tortue(turtle.Turtle):
         self.end_fill()
         self.setheading(180)
 
-    def dessinbateaux(self, grille, position):  # TODO: ajouter des tourelles et ne garder qu'une cheminée
+        # TODO: ajouter méthode "dessinsousmarin"
+
+    def dessinbateaux(self, grille, position):  # TODO: ajouter des tourelles et placer les cheminées correctement
         """Dessine les bateaux stylisés"""
         largeur = 10
         bateaux_par_type = []  # liste stockant un bateau par type
