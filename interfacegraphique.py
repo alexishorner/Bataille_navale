@@ -55,8 +55,10 @@ class Tortue(turtle.Turtle):
     """
     Cette classe permet de customiser la tortue fournie par le module "turtle".
     """
-    COULEUR_DEFAUT = "white"  # couleur de l'intértieur des cases
+    COULEUR_FOND = "blue"
     COULEUR_ARRIERE_PLAN = "white"
+    COULEUR_CALE = "#767F7E"
+    COULEUR_CHEMINEE = "red"
 
     def __init__(self):
         """
@@ -65,7 +67,6 @@ class Tortue(turtle.Turtle):
         turtle.Turtle.__init__(self)
         self.hideturtle()  # cache la tortue
         self.screen.tracer(0, 0)  # rend le dessin instantané, mais l'écran doit être rafraîchit manuellement en appelant "self.screen.update()"
-        self.fillcolor(self.couleur_case(Etat.VIDE))
 
     @staticmethod
     def couleur_case(etat):
@@ -115,6 +116,81 @@ class Tortue(turtle.Turtle):
         self.aller_a(position)
         self.write(message, align=alignement, font=police)
         self.pencolor(ancienne_couleur)  # Rétablit la couleur de la tortue
+        
+    def dessinfond(self):
+        self.hideturtle()
+        self.up()
+        self.begin_fill()
+        self.fillcolor(self.COULEUR_FOND)
+        self.goto(-4000, -4000)  # On prend large pour être sûr de remplir l'écran
+        for i in range(4):
+            self.forward(8000)
+            self.left(90)
+        self.end_fill()
+        self.screen.update()
+
+    def dessincale(self, bateau):
+        origine = self.pos()
+        self.pensize(2)
+        self.fillcolor(self.COULEUR_CALE)
+        self.begin_fill()  # cale
+        self.right(26.56)
+        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels) / math.sqrt(2))
+        self.left(26.56)
+        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels))
+        self.left(26.56)
+        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels) / math.sqrt(2))
+        self.left(153.44)
+        pos = self.pos()
+        self.goto(origine)
+        self.end_fill()
+        self.up()
+        self.goto(pos)
+        self.down()
+
+    def dessincheminee(self, bateau):
+        origine = self.pos()
+        self.setheading(90)
+        self.pensize(1)
+        self.fillcolor(self.COULEUR_CHEMINEE)
+        self.begin_fill()
+        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels / 3))
+        self.left(90)
+        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels / 6))
+        self.left(90)
+        self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels / 3))
+        self.right(90)
+        self.goto(origine)
+        self.end_fill()
+        self.setheading(180)
+
+    def dessinbateaux(self, grille, position):
+        """Dessine les bateaux stylisés"""
+        bateaux_par_type = []  # liste stockant un bateau par type
+        for bateau in grille.bateaux:
+            type_dans_liste = False  # Est-ce que le type du bateau est déjà compté?
+            for bateau_par_type in bateaux_par_type:
+                if bateau.TYPE == bateau_par_type.TYPE:
+                    type_dans_liste = True
+            if not type_dans_liste:
+                bateaux_par_type.append(bateau)  # On ne stocke qu'un bateau par type
+
+        for i, bateau in enumerate(bateaux_par_type):
+            self.up()
+            self.goto(position[0], position[1] + i* 94)
+            self.down()
+            self.setheading(0)
+            self.dessincale(bateau)
+            self.forward(abs((bateau.TAILLE - 1) * int(Case.largeur_pixels) / math.sqrt(2)))
+            for i in range(3):  # On dessine trois cheminées
+                self.dessincheminee(bateau)
+                if i < 2:
+                    self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels / 3))
+            self.up()
+            self.forward((bateau.TAILLE - 1) * int(Case.largeur_pixels) * 2)
+            self.down()
+            self.write(" X = " + str(grille.nombrebateauxdeboutpartype(bateau.TYPE)))
+            self.screen.update()
 
     def dessiner_graduations(self, origine, cote_grille):
         """
@@ -159,7 +235,6 @@ class Tortue(turtle.Turtle):
         :param cases: grille à dessiner
         :return: "None"
         """
-        self.clear()
         self.dessiner_graduations(cases[0][0].position, len(cases))
         for ligne in cases:
             for case in ligne:
@@ -493,7 +568,8 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         """
         self.afficher("Une erreur s'est produite.")
 
-    def recevoir_entree(self, texte_a_afficher=""):
+    @staticmethod
+    def recevoir_entree(texte_a_afficher=""):
         """
         Fonction équivalente à "raw_input()", mais compatible avec python 3
 
@@ -561,7 +637,9 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         """
         self.effacer_tout()
         self.dessiner_grille_console()
+        self.tortue_elements_permanents.dessinfond()
         self.tortue_elements_permanents.dessiner_grille(self.grille.cases)
+        self.tortue_elements_permanents.dessinbateaux(self.grille, (200, -200))
         self.afficher_coups_restants()
         self.afficher_temps_restant()
 

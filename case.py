@@ -264,6 +264,19 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
                 bateaux_restants.append(bateau)
         return bateaux_restants
 
+    def nombrebateauxdeboutpartype(self, typebateaux):
+        """renvoie le nombre de bateaux pas coulés d'un certain type
+        :param typebateaux: type des bateaux
+        :return: nombre de bateaux pas coulés ayant le type demandé"""
+        nombrebateauxdeboutpartype = 0  # variable comptant le nombre de bateaux debout du type voulu
+        touslesbateauxrestants = self.bateaux_restants()
+        for i in range(len(touslesbateauxrestants)):
+
+            bateaurestant = touslesbateauxrestants[i]  # On regarde chaque bateau restant
+            if bateaurestant.TYPE == typebateaux:
+                nombrebateauxdeboutpartype += 1
+        return nombrebateauxdeboutpartype
+
     def enlever_bateaux(self):
         """
         Enlève tous les bateaux de la grille.

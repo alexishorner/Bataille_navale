@@ -11,6 +11,7 @@ class AbstractBateau:
     """
     TAILLE = None  # l'attribut "largeur_pixels" est défini en dehors du constructeur, car chaque bateau d'un même type a la même taille
     TYPE = None  # le type est lui aussi commun à tous les bateaux d'une même classe
+    NOMBRE_RESTANT = None  # nombre de bateaux non coulés par type
 
     def __init__(self, cases=None):
         """
@@ -25,10 +26,10 @@ class AbstractBateau:
         if cases is not None:
             cases_libres = True
             for case in cases:
-                if case._bateau is not None and case._bateau is not self:
+                if case.bateau() is not None and case.bateau() is not self:
                     cases_libres = False
             if cases_libres:
-                self._cases = list(cases)
+                self.set_cases(list(cases))
 
     def set_cases(self, cases):
         """
@@ -38,6 +39,7 @@ class AbstractBateau:
         et que celles-ci sont adjacentes.
         :return: booléen informant sur le succès de l'opération
         """
+        etait_coule = self.est_coule()
         if not cases:  # Si "cases" est vide ou vaut "None"
             for case in self._cases:
                 case.set_bateau(None)
@@ -59,7 +61,9 @@ class AbstractBateau:
                 case.set_bateau(self)  # ajoute le bateau aux nouvelles cases
         else:
             return False  # renvoie "False", car l'opération a échoué
-
+        # On regarde si l'état du bateau a changé
+        self.__class__.NOMBRE_RESTANT += etait_coule-self.est_coule()
+        # Pour plus d'informations regarder méthode "recevoir_tir"
         return True  # renvoie "True", car les cases ont bien été remplacées
 
     def est_coule(self):
@@ -80,14 +84,22 @@ class AbstractBateau:
         :return: 1. Etat de la case après l'opération ou "None" si la case a déjà reçu un tir ou "False" si l'opération a échoué
                  2. Cases modifiées
         """
+        etait_coule = self.est_coule()
         if case in self._cases:  # si la case est une case du bateau
             if case.etat == Etat.BATEAU_INTACT:  # si la case n'a pas déjà été touchée
                 cases_modifiees = [case]
                 case.etat = Etat.TOUCHE  # le bateau est touché en cette case
                 if self.est_coule():
+                    self.NOMBRE_RESTANT -= 1
                     cases_modifiees = self._cases
                     for chaque_case in self._cases:  # On utilise le nom "chaque_case", car "case" est déjà le nom d'un paramètre
                         chaque_case.etat = Etat.COULE  # si le bateau est coulé, on change l'état de chaque case
+
+                        # On regarde si l'état du bateau a changé
+                        self.__class__.NOMBRE_RESTANT += etait_coule-self.est_coule()
+                        # Note : on a le droit de soustraire des booléens, "True" vaut 1 et "False" 0
+                        # Donc si le bateau n'était pas coulé (0) et que maintenant il l'est (1), on a 0-1 = -1,
+                        # donc on ajoute -1 (on enlève 1) au nombre de bateaux restants
                 return case.etat, cases_modifiees
             return None, None  # La case a déjà reçu un tir
         return False, None  # Il y a eu une erreur
@@ -98,7 +110,8 @@ class Torpilleur(AbstractBateau):
     Classe héritant de "AbstractBateau" permettant de créer des torpilleurs.
     """
     TAILLE = 2  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
-    TYPE = "torpilleur"
+    TYPE = "torpilleur"  # sert à afficher le type du bateau indépendamment du nom de la classe (contrairement à __class__.__name__.lower())
+    NOMBRE_RESTANT = 0
 
     def __init__(self, cases=None):
         AbstractBateau.__init__(self, cases)  # appelle le constructeur de la classe "AbstractBateau"
@@ -110,6 +123,7 @@ class SousMarin(AbstractBateau):
     """
     TAILLE = 3  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
     TYPE = "sous-marin"
+    NOMBRE_RESTANT = 0
 
     def __init__(self, cases=None):
         AbstractBateau.__init__(self, cases)  # appelle le constructeur de la classe "AbstractBateau"
@@ -121,6 +135,7 @@ class ContreTorpilleur(AbstractBateau):
     """
     TAILLE = 3  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
     TYPE = "contre-torpilleur"
+    NOMBRE_RESTANT = 0
 
     def __init__(self, cases=None):
         AbstractBateau.__init__(self, cases)  # appelle le constructeur de la classe "AbstractBateau"
@@ -132,6 +147,7 @@ class Croiseur(AbstractBateau):
     """
     TAILLE = 4  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
     TYPE = "croiseur"
+    NOMBRE_RESTANT = 0
 
     def __init__(self, cases=None):
         AbstractBateau.__init__(self, cases)  # appelle le constructeur de la classe "AbstractBateau"
@@ -143,6 +159,7 @@ class PorteAvions(AbstractBateau):
     """
     TAILLE = 5  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
     TYPE = "porte-avions"
+    NOMBRE_RESTANT = 0
 
     def __init__(self, cases=None):
         AbstractBateau.__init__(self, cases)  # appelle le constructeur de la classe "AbstractBateau"
