@@ -130,8 +130,9 @@ class Tortue(turtle.Turtle):
 
     def dessincale(self, bateau):
         """
-        alpha -> \------------/ <- beta
-                  \__________/
+                 _______________
+        alpha -> \             / <- beta
+                  \___________/
         :param bateau: bateau dont il faut dessiner la cale
         :return: pas de retour
         """
