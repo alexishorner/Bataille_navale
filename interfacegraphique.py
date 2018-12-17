@@ -158,6 +158,11 @@ class Tortue(turtle.Turtle):
         self.down()
 
     def dessintourelle(self):  # TODO: finir de dessiner la tourelle
+        """
+         __
+        /__\====
+        :return:
+        """
         hauteur = 10
         largeur = 18
         alpha = 70
@@ -196,7 +201,14 @@ class Tortue(turtle.Turtle):
         # TODO: ajouter méthode "dessinsousmarin"
 
     def dessinbateaux(self, grille, position):  # TODO: ajouter des tourelles et placer les cheminées correctement
-        """Dessine les bateaux stylisés"""
+        """Dessine les bateaux stylisés
+                ___
+               __|__
+         __   |O O O|   __
+    ====/__\__|_____|__/__\====
+        \ . . . . . . . . /
+         \_______________/
+                  """
         largeur = 10
         bateaux_par_type = []  # liste stockant un bateau par type
         for bateau in grille.bateaux:
