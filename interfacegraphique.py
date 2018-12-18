@@ -57,8 +57,17 @@ class Tortue(turtle.Turtle):
     """
     COULEUR_FOND = "blue"
     COULEUR_ARRIERE_PLAN = "white"
+    
     COULEUR_CALE = "#767F7E"
+    HAUTEUR_CALE = 20
+    
     COULEUR_CHEMINEE = "red"
+    HAUTEUR_CHEMINEE = 20
+    
+    LARGEUR_TOURELLE = 18
+    HAUTEUR_TOURELLE = 12
+    ELOIGNEMENT_TOURELLE_BORD = 2
+
 
     def __init__(self):
         """
@@ -93,12 +102,14 @@ class Tortue(turtle.Turtle):
         :param y: entier représentant la coordonnée y
         :return: "None"
         """
+        etait_en_bas = self.isdown()
         self.up()
         if y is None:
             self.goto(x)
         else:
             self.goto(x, y)
-        self.down()
+        if etait_en_bas:
+            self.down()
 
     def ecrire(self, message, position, alignement="left", police=("Arial", 8, "normal"), couleur="black"):
         """
@@ -127,6 +138,10 @@ class Tortue(turtle.Turtle):
             self.left(90)
         self.end_fill()
         self.screen.update()
+    
+    @staticmethod
+    def longueur_bateau(taille):
+        return 30*taille
 
     def dessincale(self, bateau):
         """
@@ -138,68 +153,84 @@ class Tortue(turtle.Turtle):
         """
         alpha = 85
         beta = 60
-        longueur = 30*bateau.TAILLE
-        hauteur = 20
         self.pensize(2)
+        self.down()
         self.fillcolor(self.COULEUR_CALE)
         self.begin_fill()
         self.right(alpha)
-        self.forward(hauteur/math.sin(math.radians(alpha)))
+        self.forward(self.HAUTEUR_CALE/math.sin(math.radians(alpha)))
         self.left(alpha)
-        self.forward(longueur-hauteur/math.tan(math.radians(alpha))-hauteur/math.tan(math.radians(beta)))
+        self.forward(self.longueur_bateau(bateau.TAILLE)-self.HAUTEUR_CALE/math.tan(math.radians(alpha))-self.HAUTEUR_CALE/math.tan(math.radians(beta)))
         self.left(beta)
-        self.forward(hauteur/math.sin(math.radians(beta)))
+        self.forward(self.HAUTEUR_CALE/math.sin(math.radians(beta)))
         self.left(180-beta)
         pos = self.pos()
-        self.forward(longueur)
+        self.forward(self.longueur_bateau(bateau.TAILLE))
         self.end_fill()
         self.up()
         self.goto(pos)
-        self.down()
-
-    def dessintourelle(self):  # TODO: finir de dessiner la tourelle
+        
+    def dessintourelle(self, orientation):
         """
+        Dessine une tourelle.
          __
         /__\====
-        :return:
+        
+        :param orientation: défini l'orientation de la tourelle. 1 veut dire droite et -1 gauche
+        :return: "None"
         """
-        hauteur = 10
-        largeur = 18
         alpha = 70
         beta = 80
-        #self.showturtle()  #
-        #self.tracer(1, 0)  # NOTE : Décommenter ces deux lignes pour voir le chemin de la tortue
+        origine = self.pos()
+        self.setheading(0)
+        self.down()
+        self.pensize(2)
         self.fillcolor("grey")
         self.begin_fill()
-        self.speed(0)
-        self.forward(largeur)
-        self.left(180-alpha)
-        self.forward(hauteur/math.sin(math.radians(alpha)))
-        self.left(alpha)
-        self.forward(largeur - hauteur/math.tan(math.radians(alpha)) - hauteur/math.tan(math.radians(beta)))
-        self.left(beta)
-        self.forward(hauteur/math.sin(math.radians(beta)))
+        self.forward(self.LARGEUR_TOURELLE*orientation)
+        self.left((180-alpha)*orientation)
+        self.forward(((self.HAUTEUR_TOURELLE/math.sin(math.radians(alpha)))/2.0-self.HAUTEUR_TOURELLE/6.0)*orientation)
+        self.right(75*orientation)
+        self.forward(self.LARGEUR_TOURELLE*orientation)
+        self.left(90*orientation)
+        self.forward(self.LARGEUR_TOURELLE/6.0*orientation)
+        self.left(90*orientation)
+        self.forward((self.LARGEUR_TOURELLE - self.LARGEUR_TOURELLE/6.0*math.tan(math.radians(90-75)))*orientation)
+        self.right(105*orientation)
+        self.forward((self.HAUTEUR_TOURELLE/math.sin(math.radians(alpha)))/2.0*orientation)
+        self.left(alpha*orientation)
+        self.forward(abs(self.LARGEUR_TOURELLE - self.HAUTEUR_TOURELLE/math.tan(math.radians(alpha)) - self.HAUTEUR_TOURELLE/math.tan(math.radians(beta)))*orientation)
+        self.left(beta*orientation)
+        self.goto(origine)
         self.end_fill()
+        self.up()
 
+    @staticmethod
+    def largeur_cheminee(taille_bateau):
+        return (taille_bateau - 1) * int(13/6.0)
+
+    @staticmethod
+    def espacement_cheminees(taille_bateau):
+        return (taille_bateau - 1) * int(10 / 3.0)
+              
     def dessincheminee(self, bateau):
-        largeur = 10
         origine = self.pos()
         self.setheading(90)
+        self.down()
         self.pensize(1)
         self.fillcolor(self.COULEUR_CHEMINEE)
         self.begin_fill()
-        self.forward((bateau.TAILLE - 1) * int(largeur / 3.0))
+        self.forward(self.HAUTEUR_CHEMINEE)
         self.left(90)
-        self.forward((bateau.TAILLE - 1) * int(largeur / 6.0))
+        self.forward(self.largeur_cheminee(bateau.TAILLE))
         self.left(90)
-        self.forward((bateau.TAILLE - 1) * int(largeur / 3.0))
+        self.forward(self.HAUTEUR_CHEMINEE)
         self.right(90)
         self.goto(origine)
         self.end_fill()
         self.setheading(180)
-
-        # TODO: ajouter méthode "dessinsousmarin"
-
+        self.up()
+        
     def dessinbateaux(self, grille, position):  # TODO: ajouter des tourelles et placer les cheminées correctement
         """Dessine les bateaux stylisés
                 ___
@@ -209,7 +240,6 @@ class Tortue(turtle.Turtle):
         \ . . . . . . . . /
          \_______________/
                   """
-        largeur = 10
         bateaux_par_type = []  # liste stockant un bateau par type
         for bateau in grille.bateaux:
             type_dans_liste = False  # Est-ce que le type du bateau est déjà compté?
@@ -220,21 +250,44 @@ class Tortue(turtle.Turtle):
                 bateaux_par_type.append(bateau)  # On ne stocke qu'un bateau par type
 
         for i, bateau in enumerate(bateaux_par_type):
-            self.up()
-            self.goto(position[0], position[1] + i*94)
-            self.down()
+            origine = (position[0], position[1] + i*94)
+            self.aller_a(origine)
             self.setheading(0)
             self.dessincale(bateau)
-            self.forward(abs((bateau.TAILLE - 1) * largeur / math.sqrt(2)))
-            for i in range(3):  # On dessine trois cheminées
+            self.forward(self.LARGEUR_TOURELLE+self.ELOIGNEMENT_TOURELLE_BORD)
+            self.dessintourelle(1)
+            self.setheading(180)
+            self.forward(self.longueur_bateau(bateau.TAILLE) - 2*(self.LARGEUR_TOURELLE+self.ELOIGNEMENT_TOURELLE_BORD))
+            self.dessintourelle(-1)
+            self.setheading(0)
+
+
+            if bateau.TAILLE <= 2:
+                nombre_cheminees = 0
+            elif bateau.TAILLE == 3:
+                nombre_cheminees = 1
+            elif bateau.TAILLE == 4:
+                nombre_cheminees = 2
+            else:
+                nombre_cheminees = 3
+            self.forward(self.longueur_bateau(bateau.TAILLE)/2.0-self.LARGEUR_TOURELLE
+                         +(nombre_cheminees*self.largeur_cheminee(bateau.TAILLE)
+                           +(nombre_cheminees-1)*self.espacement_cheminees(bateau.TAILLE))/2.0
+                         -self.largeur_cheminee(bateau.TAILLE))
+            for i in range(nombre_cheminees):  # On dessine deux cheminées
                 self.dessincheminee(bateau)
-                if i < 2:
-                    self.forward((bateau.TAILLE - 1) * int(largeur / 3.0))
-            self.up()
-            self.forward((bateau.TAILLE - 1) * largeur * 2)
-            self.down()
-            self.write(" X = " + str(grille.nombrebateauxdeboutpartype(bateau.TYPE)))
+                if i < nombre_cheminees-1:
+                    self.forward(self.espacement_cheminees(bateau.TAILLE))
             self.screen.update()
+
+    def dessintextenombrebateaux(self, grille, position):
+        for i, bateau in enumerate(grille.bateaux):
+            self.aller_a(position[0] - 15, position[1] + i*94 - 20)
+            self.down()
+            self.write(str(grille.nombrebateauxdeboutpartype(bateau.TYPE)) + " × ", align="center", font=("Arial", 12, "bold"))
+        self.screen.update()
+
+
 
     def dessiner_graduations(self, origine, cote_grille):
         """
@@ -263,7 +316,9 @@ class Tortue(turtle.Turtle):
         :param case: case à dessiner
         :return: "None"
         """
-        self.fillcolor(self.couleur_case(case.etat))
+        self.down()
+        self.pensize(1)
+        self.color("black", self.couleur_case(case.etat))
         points = case.carre()
         self.aller_a(points[0])  # Va au point inférieur droite de la case
         self.begin_fill()
@@ -324,7 +379,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         else:
             return "difficile"
         
-    def generer_nombre_de_coups_maximum(self, taille_grille=None, difficulte=None):
+    def generer_nombre_de_coups_maximum(self, taille_grille=None, difficulte=None):# TODO: prendre en compte les bateaux
         """
         Génère automatiquement une valeur pour le nombre de coups maximum en fonction de la difficulté
         
@@ -338,7 +393,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                 _difficulte = self.difficulte
         return int(round(_taille_grille**2/2.0*(1-_difficulte/10.0)))
 
-    def nombre_de_coups_maximum(self, taille_grille=None, difficulte=None):  # TODO: prendre en compte les bateaux
+    def nombre_de_coups_maximum(self, taille_grille=None, difficulte=None):
         """
         Retourne le nombre maximal de coups.
 
@@ -537,17 +592,17 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                                     recommencer2 = True
                                     continue
                         else:  # "Taille grille"
-                            nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("\nAvec quelle taille de grille souhaitez-vous jouer? (nombre entre 3 et 26)\n"))
+                            nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("\nAvec quelle taille de grille souhaitez-vous jouer? (nombre entre 6 et 26)\n"))
                             try:  # On teste si la ligne suivante provoque une erreur
                                 nouvelle_valeur = int(float(nouvelle_valeur))  # Le "float" permet d'accepter des valeurs comme 5.0 ou 2.3e1 (23)
                             except ValueError:  # Si une erreur de valeur est signalée
                                 print("Erreur, vous devez entrer un nombre")
-                            if nouvelle_valeur >= 3 and nouvelle_valeur <= 26:
+                            if nouvelle_valeur >= 6 and nouvelle_valeur <= 26:
                                 cote = nouvelle_valeur
                                 self._nouvelle_taille_grille = cote  # TODO: changer taille grille au début de la partie
                                 print("Taille de la grille changée à {0}, les modifications prendront effet à la prochaine partie.".format(cote))
-                            elif nouvelle_valeur < 3:
-                                print ("La grille doit avoir une taille minimum de 3 cases pour pouvoir placer des bateaux")
+                            elif nouvelle_valeur < 6:
+                                print ("La grille doit avoir une taille minimum de 6 cases pour pouvoir placer des bateaux")
                                 recommencer2 = True
                                 continue
                             else:
@@ -634,18 +689,18 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                     continue
 
 
-    def afficher_coups_restants(self):
+    def afficher_coups_restants(self):  # TODO: changer position et taille
         """
         Affiche le nombre de coups restants pour l'utilisateur.
 
         :return: "None"
         """
-        self.afficher("Coups restants : " + str(self.coups_restants()))
+        self.tortue_elements_provisoires.ecrire("Coups restants : " + str(self.coups_restants()), (-370, 295), "left", ("Arial", 12, "normal"))
 
-    def afficher_temps_restant(self):
+    def afficher_temps_restant(self):  # TODO: Idem
         texte = "Temps restant : {0} s".format(int(round(self.temps_restant())))
         print(texte)
-        self.tortue_elements_provisoires.ecrire(texte, (-300, 300), "center")
+        self.tortue_elements_provisoires.ecrire(texte, (-370, 275), "left", ("Arial", 12, "normal"))
 
     def afficher_erreur(self):
         """
@@ -716,21 +771,6 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         self.temps_depart = time.time()
         self.dessiner_tout()
 
-    def dessiner_tout(self):
-        """
-        Dessine la grille en entier avec la tortue et dans la console et affiche différentes informations.
-
-        C'est ici que les éléments à l'écran ne changeant pas, comme le fond d'écran, sont dessinés.
-        :return: "None"
-        """
-        self.effacer_tout()
-        self.dessiner_grille_console()
-        self.tortue_elements_permanents.dessinfond()
-        self.tortue_elements_permanents.dessiner_grille(self.grille.cases)
-        self.tortue_elements_permanents.dessinbateaux(self.grille, (200, -200))
-        self.afficher_coups_restants()
-        self.afficher_temps_restant()
-
     def actualiser(self, cases=None):
         """
         Actualise l'écran.
@@ -746,6 +786,21 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         self.tortue_elements_permanents.screen.update()
         self.afficher_coups_restants()
         self.afficher_temps_restant()
+        self.tortue_elements_provisoires.dessintextenombrebateaux(self.grille, (-300, -215))
+
+    def dessiner_tout(self):
+        """
+        Dessine la grille en entier avec la tortue et dans la console et affiche différentes informations.
+
+        C'est ici que les éléments à l'écran ne changeant pas, comme le fond d'écran, sont dessinés.
+        :return: "None"
+        """
+        self.effacer_tout()
+        self.dessiner_grille_console()
+        self.tortue_elements_permanents.dessinfond()
+        self.tortue_elements_permanents.dessiner_grille(self.grille.cases)
+        self.tortue_elements_permanents.dessinbateaux(self.grille, (-300, -215))
+        self.actualiser()
 
     def ajouter_espacement_avant(self, nombre=None):
         """

@@ -203,7 +203,7 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
     def creer_cases(self):
         self.cases = []
         Case.largeur_pixels = round(self.LARGEUR_PIXELS_IDEALE / self._taille)  # ajuste la largeur des cases en fonction de la taille de la grille
-        decalage_x = -self._taille * Case.largeur_pixels / 2.0  # décalage permettant de centrer la grille
+        decalage_x = (-self._taille + 4) * Case.largeur_pixels / 2.0  # décalage permettant de centrer la grille
         decalage_y = (self._taille - 4) * Case.largeur_pixels / 2.0  # on décale moins, car sinon la grille est trop haute
         for i in range(self._taille):
             ligne = []
