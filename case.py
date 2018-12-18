@@ -184,7 +184,7 @@ class Case:
             return None, None
 
 
-class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire pour simplifier le code
+class Grille:
     """
     Classe représentant la grille de jeu de la bataille navale.
 
@@ -360,7 +360,7 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
             lettres += copie_coordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copie_coordonnees".
             copie_coordonnees = copie_coordonnees[1:len(copie_coordonnees)]
         for c in lettres:
-            x += str(string.ascii_letters.index(c))  # On transforme les lettres en nombres TODO: Augmenter sécurité
+            x += str(string.ascii_letters.index(c))  # On transforme les lettres en nombres
         try:
             x = int(x)
             y = int(copie_coordonnees) - 1
@@ -524,6 +524,6 @@ class Grille:  # TODO: éventuellement stocker les cases dans un dictionnaire po
         bateaux_a_placer = trier_bateaux_par_taille(self.bateaux, True)  # On trie les bateaux dans l'ordre décroissant pour
                                                                          # placer les plus grands en premier
         for bateau in bateaux_a_placer:
-            cases_possibles = self.__obsolete_groupes_de_cases_libres(bateau.TAILLE)  # TODO: attention bugs possibles si aucun groupe n'est trouvé
+            cases_possibles = self.__obsolete_groupes_de_cases_libres(bateau.TAILLE)
             bateau.set_cases(random.choice(cases_possibles))  # Sélectionne un groupe de cases aléatoire pour les cases du bateau
         return True

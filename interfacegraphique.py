@@ -341,7 +341,7 @@ class Tortue(turtle.Turtle):
         self.screen.update()
 
 
-class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, afficher bateaux restants et coulés
+class Afficheur:  # TODO: titre, barrer cases coulées
     """
     Cette classe permet de dessiner les objets à l'écran. Elle utilise un objet "Tortue" ou la console pour dessiner à l'écran.
     """
@@ -352,7 +352,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
 
         :param grille: grille de jeu à afficher
         """
-        self.difficulte = Difficulte.MOYEN  # TODO: implémenter difficulté
+        self.difficulte = Difficulte.MOYEN
         self._nouvelle_difficulte = self.difficulte
         self._parametre_nombre_de_coups_maximum = "auto"
         self._nouveau_parametre_nombre_de_coups_maximum = self._parametre_nombre_de_coups_maximum
@@ -448,7 +448,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
     def temps_restant(self):
         return self.temps_maximum()-(time.time() - self.temps_depart)
 
-    def joueur_a_perdu(self):  # TODO: ajouter autres contraintes
+    def joueur_a_perdu(self):
         """
         Détermine si le joueur a perdu
 
@@ -488,7 +488,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         self.tortue_elements_provisoires.ecrire(message, position, alignement="center", police=("Arial", 8, "bold"))
         self.tortue_elements_provisoires.screen.update()
 
-    def afficher_parametres(self, partie_en_cours=False):  # TODO: ajouter paramètre taille grille et améliorer alignement texte
+    def afficher_parametres(self, partie_en_cours=False):
         titre = "Paramètres"
         texte = ["1. Difficulté : {0}".format(self.chaine_nouvelle_difficulte()),
                  "2. Nombre maximum de coups : {0}".format(self.chaine_nouveau_nombre_de_coups_maximum()),
@@ -532,7 +532,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                                 print("La difficulté ne peut pas être automatique")
                                 recommencer2 = True
                                 continue
-                            elif nouvelle_valeur in ("1", "1.", "f", "facile"):  # TODO: changer autres paramètres en accord avec la difficulté
+                            elif nouvelle_valeur in ("1", "1.", "f", "facile"):
                                 self._nouvelle_difficulte = Difficulte.FACILE
                             elif nouvelle_valeur in ("2", "2.", "m", "moyen"):
                                 self._nouvelle_difficulte = Difficulte.MOYEN
@@ -562,7 +562,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                                 if nouvelle_valeur >= self.grille.nombre_de_cases_occupees():  # On veut que le nombre
                                                                                                # de coups soit au moins
                                                                                                # égal au nombre de cases occupées
-                                    self._nouveau_parametre_nombre_de_coups_maximum = nouvelle_valeur  # TODO: vérifier quand partie est en cours
+                                    self._nouveau_parametre_nombre_de_coups_maximum = nouvelle_valeur
                                     print("Nombre de coups maximum changé à {0}, les modifications prendront effet à la prochaine partie.".format(nouvelle_valeur))
                                 else:
                                     print("Nombre de coups insuffisant.")
@@ -652,9 +652,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                 if partie_en_cours:
                     self.dessiner_tout()  # On continue la partie
                 else:
-                    print("Vous ne pouvez pas revenir en arrière ici.")
-                    recommencer = True
-                    continue
+                    self.rejouer()
             else:
                 try:
                     entree = int(entree)  # On convertit l'entrée en nombres, si ça ne marche pas, on affiche une erreur
@@ -667,13 +665,12 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                     entree -= 1
                 if entree == 0:  # "Continuer"
                     self.dessiner_tout()
-                elif entree == 1:  # "Recommencer"
+                elif entree == 1:  # "Nouvelle partie"
                     if partie_en_cours:
-                        if self.confirmer_question("Êtes-vous sûr(e) de vouloir recommencer? Votre partie n'est pas finie. o/n"):
-                            self.rejouer()
-                        else:
+                        if not self.confirmer_question("Êtes-vous sûr(e) de vouloir recommencer? Votre partie n'est pas finie. o/n"):
                             recommencer = True
                             continue  # On recommence la boucle
+                    self.rejouer()
                 elif entree == 2:  # "Paramètres"
                     self.afficher_parametres(partie_en_cours=partie_en_cours)
                     return
@@ -689,18 +686,18 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                     continue
 
 
-    def afficher_coups_restants(self):  # TODO: changer position et taille
+    def afficher_coups_restants(self):
         """
         Affiche le nombre de coups restants pour l'utilisateur.
 
         :return: "None"
         """
-        self.tortue_elements_provisoires.ecrire("Coups restants : " + str(self.coups_restants()), (-370, 295), "left", ("Arial", 12, "normal"))
+        self.tortue_elements_provisoires.ecrire("Coups restants : " + str(self.coups_restants()), (-330, 295), "left", ("Arial", 12, "normal"))
 
-    def afficher_temps_restant(self):  # TODO: Idem
+    def afficher_temps_restant(self):
         texte = "Temps restant : {0} s".format(int(round(self.temps_restant())))
         print(texte)
-        self.tortue_elements_provisoires.ecrire(texte, (-370, 275), "left", ("Arial", 12, "normal"))
+        self.tortue_elements_provisoires.ecrire(texte, (-330, 275), "left", ("Arial", 12, "normal"))
 
     def afficher_erreur(self):
         """
@@ -767,7 +764,8 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         self.nombre_de_coups = 0
         if not self.grille.placer_bateaux():
             self.afficher("Impossible de placer les bateaux, la grille est peut-être trop petite par rapport au nombre de bateaux.")
-            exit(1)  # TODO: éventuellement changer le comportement en cas d'erreur
+            self.afficher_menu(partie_en_cours=False)
+            return
         self.temps_depart = time.time()
         self.dessiner_tout()
 
@@ -796,7 +794,6 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         :return: "None"
         """
         self.effacer_tout()
-        self.dessiner_grille_console()
         self.tortue_elements_permanents.dessinfond()
         self.tortue_elements_permanents.dessiner_grille(self.grille.cases)
         self.tortue_elements_permanents.dessinbateaux(self.grille, (-300, -215))
@@ -842,7 +839,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         if index_x == self.grille.taille()-1:
             print("|\n", end="")
 
-    def dessiner_grille_console(self):  # TODO: faire en sorte de pouvoir actualiser la grille sans l'afficher plusieurs fois
+    def dessiner_grille_console(self):
         """
         Dessine la grille dans la console.
 
@@ -931,7 +928,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
             self.afficher_parametres(partie_en_cours=True)
         else:
             retour, cases = self.grille.tirer(entree)  # On tire sur la case et on enregistre le retour de la méthode
-            self.afficher_retour_tir(retour, cases)  # TODO: continuer
+            self.afficher_retour_tir(retour, cases)
             self.actualiser(cases)
 
             if self.joueur_a_gagne():
@@ -952,7 +949,6 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         Demande à l'utlisateur où il veut tirer et tire sur la case.
         :return: "None"
         """
-        self.rejouer()
         while True:
             entree = self.recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
             #entree = string.ascii_uppercase[random.randint(0, self.grille.largeur_pixels)] + str(random.randint(0, self.grille.largeur_pixels))
