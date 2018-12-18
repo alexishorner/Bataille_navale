@@ -152,7 +152,6 @@ class Tortue(turtle.Turtle):
         self.left(180-beta)
         pos = self.pos()
         self.forward(longueur)
-        print(str(math.sqrt((self.xcor()-pos[0])**2+(self.ycor()-pos[1])**2)))
         self.end_fill()
         self.up()
         self.goto(pos)
@@ -303,7 +302,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         self._parametre_nombre_de_coups_maximum = "auto"
         self._nouveau_parametre_nombre_de_coups_maximum = self._parametre_nombre_de_coups_maximum
         self.temps_par_coup = 5
-        self._parametre_temps_maximum = "auto"  # TODO: implémenter contrainte de temps
+        self._parametre_temps_maximum = "auto"
         self._nouveau_parametre_temps_maximum = self._parametre_temps_maximum
         self.grille = grille
         self._nouvelle_taille_grille = grille.taille()
@@ -432,6 +431,7 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
         print(message, end=fin)
         position = (0, self.grille.position_coins()[1][1]-25)  # On place en bas au milieu de la grille
         self.tortue_elements_provisoires.ecrire(message, position, alignement="center", police=("Arial", 8, "bold"))
+        self.tortue_elements_provisoires.screen.update()
 
     def afficher_parametres(self, partie_en_cours=False):  # TODO: ajouter paramètre taille grille et améliorer alignement texte
         titre = "Paramètres"
@@ -537,22 +537,23 @@ class Afficheur:  # TODO: ajouter menu, taille grille variable, niveaux, affiche
                                     recommencer2 = True
                                     continue
                         else:  # "Taille grille"
-                            entree = chaine_nettoyee(self.recevoir_entree("\nAvec quelle taille de grille souhaitez-vous jouer? (nombre entre 3 et 26)\n"))
+                            nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("\nAvec quelle taille de grille souhaitez-vous jouer? (nombre entre 3 et 26)\n"))
                             try:  # On teste si la ligne suivante provoque une erreur
-                                entree = int(float(entree))  # Le "float" permet d'accepter des valeurs comme 5.0 ou 2.3e1 (23)
+                                nouvelle_valeur = int(float(nouvelle_valeur))  # Le "float" permet d'accepter des valeurs comme 5.0 ou 2.3e1 (23)
                             except ValueError:  # Si une erreur de valeur est signalée
                                 print("Erreur, vous devez entrer un nombre")
-                            if entree >= 3 and entree <= 26:
-                                cote = entree
+                            if nouvelle_valeur >= 3 and nouvelle_valeur <= 26:
+                                cote = nouvelle_valeur
                                 self._nouvelle_taille_grille = cote  # TODO: changer taille grille au début de la partie
                                 print("Taille de la grille changée à {0}, les modifications prendront effet à la prochaine partie.".format(cote))
-                            elif entree < 3:
+                            elif nouvelle_valeur < 3:
                                 print ("La grille doit avoir une taille minimum de 3 cases pour pouvoir placer des bateaux")
                                 recommencer2 = True
                                 continue
                             else:
                                 print ("La grille est trop grande, le maximum est 26")
                                 recommencer2 = True
+                                continue
                 else:
                     self.afficher_erreur()
                     recommencer = True
