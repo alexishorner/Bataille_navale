@@ -1,8 +1,10 @@
 # coding: utf-8
+"""
+Module de lancement de la bataille navale.
+"""
 from case import Grille
 from interfacegraphique import Afficheur
 import bateau
-import time
 
 NOMBRE_TORPILLEURS = 1
 NOMBRE_SOUS_MARINS = 1
@@ -17,7 +19,6 @@ def creer_bateau(classe, nombre):
 
     :param classe: Classe des bateaux à créer
     :param nombre: Nombre de bateaux à créer
-    :param liste: Liste où stocker les bateaux
     :return: bateaux créés
     """
     bateaux = []
@@ -25,7 +26,13 @@ def creer_bateau(classe, nombre):
         bateaux.append(classe())  # classe() appelle le constructeur de la classe
     return bateaux
 
+
 def creer_bateaux():
+    """
+    Crée une liste contenant le nombre désiré de chaque type de bateau.
+
+    :return: "None"
+    """
     bateaux = []
     bateaux.extend(creer_bateau(bateau.Torpilleur, NOMBRE_TORPILLEURS))
     bateaux.extend(creer_bateau(bateau.SousMarin, NOMBRE_SOUS_MARINS))

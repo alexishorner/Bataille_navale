@@ -1,4 +1,7 @@
 # coding: utf-8
+"""
+Module contenant des classes relatives aux bateaux.
+"""
 
 from case import Etat, Case
 
@@ -9,7 +12,8 @@ class AbstractBateau:
 
     Le mot "Abstract" dans son nom indique qu'elle n'est pas conçue pour être utilisée de manière directe.
     """
-    TAILLE = None  # l'attribut "largeur_pixels" est défini en dehors du constructeur, car chaque bateau d'un même type a la même taille
+    TAILLE = None   # l'attribut "largeur_pixels" est défini en dehors du constructeur,
+                    # car chaque bateau d'un même type a la même taille
     TYPE = None  # le type est lui aussi commun à tous les bateaux d'une même classe
     NOMBRE_RESTANT = None  # nombre de bateaux non coulés par type
 
@@ -17,7 +21,8 @@ class AbstractBateau:
         """
         constructeur de la classe "AbstractBateau"
 
-        ATTENTION : comme suggéré par le caractère "_" dans le nom de l'attribut "_cases", il ne faut jamais modifier cet attribut directement.
+        ATTENTION : comme suggéré par le caractère "_" dans le nom de l'attribut "_cases",
+        il ne faut jamais modifier cet attribut directement.
         Pour modifier la valeur de cet attribut il faut absolument utiliser la méthode "setCases(self, cases)".
 
         :param cases: tuple contenant les cases occupées par le _bateau
@@ -50,7 +55,8 @@ class AbstractBateau:
             # Cette condition vérifie qu'il y a le bon nombre de cases, qu'elle sont alignées et
             # qu'il n'y a pas d'espace les séparant.
             for case in cases:
-                if case.bateau() is not None:  # vérifie qu'un autre bateau n'est pas déjà présent sur une des nouvelles cases
+                if case.bateau() is not None:   # vérifie qu'un autre bateau n'est pas déjà présent
+                                                # sur une des nouvelles cases
                     return False  # renvoie "False" car un bateau est déjà présent
 
             for case in self._cases:
@@ -81,7 +87,8 @@ class AbstractBateau:
         """
         Méthode appelée lorsque le joueur tire sur une case appartenant au bateau.
 
-        :return: 1. Etat de la case après l'opération ou "None" si la case a déjà reçu un tir ou "False" si l'opération a échoué
+        :return: 1. Etat de la case après l'opération ou "None" si la case a déjà reçu un tir ou
+                    "False" si l'opération a échoué
                  2. Cases modifiées
         """
         etait_coule = self.est_coule()
@@ -92,7 +99,8 @@ class AbstractBateau:
                 if self.est_coule():
                     self.NOMBRE_RESTANT -= 1
                     cases_modifiees = self._cases
-                    for chaque_case in self._cases:  # On utilise le nom "chaque_case", car "case" est déjà le nom d'un paramètre
+                    for chaque_case in self._cases:     # On utilise le nom "chaque_case", car "case" est déjà
+                                                        # le nom d'un paramètre
                         chaque_case.etat = Etat.COULE  # si le bateau est coulé, on change l'état de chaque case
 
                         # On regarde si l'état du bateau a changé
@@ -110,7 +118,8 @@ class Torpilleur(AbstractBateau):
     Classe héritant de "AbstractBateau" permettant de créer des torpilleurs.
     """
     TAILLE = 2  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
-    TYPE = "torpilleur"  # sert à afficher le type du bateau indépendamment du nom de la classe (contrairement à __class__.__name__.lower())
+    TYPE = "torpilleur"     # sert à afficher le type du bateau indépendamment du nom de la classe
+                            # (contrairement à __class__.__name__.lower())
     NOMBRE_RESTANT = 0
 
     def __init__(self, cases=None):

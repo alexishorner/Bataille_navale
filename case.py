@@ -1,4 +1,7 @@
 # coding: utf-8
+"""
+Module contenant les classes relatives aux cases et à la grille de jeu.
+"""
 from enum import IntEnum, unique
 import string
 import random
@@ -6,7 +9,7 @@ from numpy import array
 import time
 
 
-def trier_bateaux_par_taille(bateaux, decroissant = False):
+def trier_bateaux_par_taille(bateaux, decroissant=False):
     """
     Trie une liste de bateaux par taille
     :param bateaux: liste de bateaux
@@ -73,16 +76,20 @@ class Case:
         :return: booléen indiquant si les cases sont alignées
         """
         if cases is not None and len(cases) > 0:
-            if cases[0].position[Coord.x] == cases[-1].position[Coord.x]:  # si la première case a la même coordonnée x que la dernière
+            if cases[0].position[Coord.x] == cases[-1].position[Coord.x]:
+                # si la première case a la même coordonnée x que la dernière
                 coord = Coord.x  # on défini une variable indiquant qu'il faut regarder l'alignement sur x
-            elif cases[0].position[Coord.y] == cases[-1].position[Coord.y]:  # si la première case a la même coordonnée y que la dernière
+            elif cases[0].position[Coord.y] == cases[-1].position[Coord.y]:
+                # si la première case a la même coordonnée y que la dernière
                 coord = Coord.y  # on défini une variable indiquant qu'il faut regarder l'alignement sur y
             else:
                 return False
 
             premiere_case = cases[0]
-            for i in range(1, len(cases)-1):  # on ne teste pas la première et la dernière, car cela a déjà été fait avant
-                if abs(cases[i].position[coord] - premiere_case.position[coord]) > 0.0001:  # si la case n'est pas alignée avec la première case
+            for i in range(1, len(
+                    cases) - 1):  # on ne teste pas la première et la dernière, car cela a déjà été fait avant
+                if abs(cases[i].position[coord] - premiere_case.position[coord]) > 0.0001:
+                    # si la case n'est pas alignée avec la première case
                     return False
             return True
         return False
@@ -129,7 +136,7 @@ class Case:
         x = self.position[Coord.x]
         y = self.position[Coord.y]
         cote = self.largeur_pixels
-        return [x, y], [x+cote, y], [x+cote, y+cote], [x, y+cote]
+        return [x, y], [x + cote, y], [x + cote, y + cote], [x, y + cote]
 
     def milieu(self):
         """
@@ -172,7 +179,8 @@ class Case:
         """
         Méthode appelée lorsqu'un tir est dirigé vers cette case.
 
-        :return: 1. État de la case après l'opération ou "None" si la case a déjà reçu un tir ou "False" s'il y a eu une erreur
+        :return: 1. État de la case après l'opération ou "None" si la case a déjà reçu un tir ou
+                    "False" s'il y a eu une erreur
                  2. Cases modifiées s'il y en a, "None" sinon
         """
         if self._bateau is not None:  # si un bateau est présent sur la case
@@ -201,8 +209,15 @@ class Grille:
         self.set_taille(taille)  # On change la valeur de "self.taille"
 
     def creer_cases(self):
+        """
+        Crée les cases de la grille en ajustant leur taille pour avoir une largeur de grille approximativement fixe,
+        tout en ayant un nombre entier pour la largeur de chaque case.
+
+        :return: "None"
+        """
         self.cases = []
-        Case.largeur_pixels = round(self.LARGEUR_PIXELS_IDEALE / self._taille)  # ajuste la largeur des cases en fonction de la taille de la grille
+        Case.largeur_pixels = round(
+            self.LARGEUR_PIXELS_IDEALE / self._taille)  # ajuste la largeur des cases en fonction de la taille de la grille
         decalage_x = -self._taille * Case.largeur_pixels / 2.0 + 80  # décalage permettant de centrer la grille
         decalage_y = self._taille * Case.largeur_pixels / 2.0 - 40  # on décale moins, car sinon la grille est trop haute
         for i in range(self._taille):
@@ -213,6 +228,10 @@ class Grille:
             self.cases.append(ligne)
 
     def taille(self):
+        """
+        Accesseur de l'attribut protégé "_taille"
+        :return:
+        """
         return self._taille
 
     def set_taille(self, taille):
@@ -238,11 +257,16 @@ class Grille:
         return self._taille * Case.largeur_pixels
 
     def position_coins(self):
+        """
+        Retourne les coordonnées des coins de la grille.
+
+        :return: liste contenant les quatre coins de la grille.
+        """
         coin_superieur_gauche = self.cases[0][0].carre()[3]
         coin_inferieur_gauche = self.cases[self._taille - 1][0].carre()[0]
         coin_inferieur_droit = self.cases[self._taille - 1][self._taille - 1].carre()[1]
         coin_superieur_droit = self.cases[0][self._taille - 1].carre()[2]
-        return coin_superieur_gauche, coin_inferieur_gauche, coin_inferieur_droit, coin_inferieur_droit
+        return coin_superieur_gauche, coin_inferieur_gauche, coin_inferieur_droit, coin_superieur_droit
 
     def nombre_de_cases_occupees(self):
         """
@@ -309,32 +333,35 @@ class Grille:
         :return: réussite de l'opération
         """
         self.reinitialiser()
-        bateaux_a_placer = trier_bateaux_par_taille(self.bateaux, True)     # On trie les bateaux dans l'ordre décroissant pour
-                                                                            # placer les plus grands en premier
+        bateaux_a_placer = trier_bateaux_par_taille(self.bateaux,
+                                                    True)  # On trie les bateaux dans l'ordre décroissant pour
+        # placer les plus grands en premier
         for bateau in bateaux_a_placer:
             temps_depart = time.time()  # On regarde quand on a commencé à placer le bateau
             recommencer = True
-            while recommencer and time.time()-temps_depart < 1:  # Cette boucle se répète tant qu'on a pas réussi a placer le bateau
+            while recommencer and time.time() - temps_depart < 1:
+                # Cette boucle se répète tant qu'on a pas réussi à placer le bateau
                 cases_bateau = []
                 index_premiere_case = (random.randint(0, self._taille - 1), random.randint(0, self._taille - 1))
-                sens_vertical = random.choice((0, 0, -1, 1))  # Variable déterminant dans quel sens on cherche les cases horizontalement
+                sens_vertical = random.choice(
+                    (0, 0, -1, 1))  # Variable déterminant dans quel sens on cherche les cases horizontalement
                 if sens_vertical == 0:  # Si on cherche les cases verticalement
                     sens_horizontal = random.choice((-1, 1))  # on détermine si on cherche vers la gauche ou la droite
                 else:
                     sens_horizontal = 0  # La valeur 0 empêche de chercher horizontalement
-                index_derniere_case = (index_premiere_case[Coord.y] + sens_vertical*bateau.TAILLE,
-                                       index_premiere_case[Coord.x] + sens_horizontal*bateau.TAILLE)
+                index_derniere_case = (index_premiere_case[Coord.y] + sens_vertical * bateau.TAILLE,
+                                       index_premiere_case[Coord.x] + sens_horizontal * bateau.TAILLE)
                 if (index_derniere_case[Coord.y] in range(self._taille) and
-                    index_derniere_case[Coord.x] in range(self._taille)):  # Si la dernière case est dans la grille
+                        index_derniere_case[Coord.x] in range(self._taille)):  # Si la dernière case est dans la grille
                     for i in range(bateau.TAILLE):
-                        index_y = index_premiere_case[Coord.y]+i*sens_vertical
-                        index_x = index_premiere_case[Coord.x]+i*sens_horizontal
+                        index_y = index_premiere_case[Coord.y] + i * sens_vertical
+                        index_x = index_premiere_case[Coord.x] + i * sens_horizontal
                         case = self.cases[index_y][index_x]
                         if case.bateau() is None:  # Si la case est vide
                             cases_bateau.append(case)
                         else:
-                            break   # Si au moins une case n'est pas vide, on sort de la boucle for et on recommence au
-                                    # début de la boucle while
+                            break  # Si au moins une case n'est pas vide, on sort de la boucle for et on recommence au
+                            # début de la boucle while
                     if len(cases_bateau) == bateau.TAILLE:  # Si toutes les cases parcourues étaient vides
                         bateau.set_cases(cases_bateau)
                         recommencer = False
@@ -349,7 +376,8 @@ class Grille:
         :param coordonnees: coordonnées de la bataille navale
         :return: coordonnées équivalentes sur la grille ou "False" si l'opération a échoué
         """
-        copie_coordonnees = "".join(coordonnees)  # On assure que "copieCoordonnes" est une chaîne de caractères et non une liste ou un tuple
+        copie_coordonnees = "".join(
+            coordonnees)  # On assure que "copieCoordonnes" est une chaîne de caractères et non une liste ou un tuple
         copie_coordonnees = copie_coordonnees.replace(" ", "")  # On enlève les espaces.
         copie_coordonnees = copie_coordonnees.replace(".", "")  # On enlève les points
         copie_coordonnees = copie_coordonnees.replace(",", "")  # On enlève les virgules
@@ -357,7 +385,8 @@ class Grille:
         x = ""
         lettres = ""
         while copie_coordonnees and copie_coordonnees[0].isalpha():
-            lettres += copie_coordonnees[0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copie_coordonnees".
+            lettres += copie_coordonnees[
+                0]  # On copie toutes les lettres du début dans "x" et on les enlève de "copie_coordonnees".
             copie_coordonnees = copie_coordonnees[1:len(copie_coordonnees)]
         for c in lettres:
             x += str(string.ascii_letters.index(c))  # On transforme les lettres en nombres
@@ -392,8 +421,10 @@ class Grille:
         if type(coordonnees) is tuple or type(coordonnees) is list:  # Si les coordonnées sont une liste ou un tuple
             if len(coordonnees) == 2:
                 for coordonnee in coordonnees:
-                    if (type(coordonnee) is not int and type(coordonnees) is not float # Si le type des coordonnées n'est pas un nombre
-                    or coordonnee not in range(self._taille)):  # ou si les coordonnées n'ont pas la bonne valeur
+                    if (type(coordonnee) is not int and type(
+                            coordonnees) is not float  # Si le type des coordonnées n'est pas un nombre
+                            or coordonnee not in range(
+                                self._taille)):  # ou si les coordonnées n'ont pas la bonne valeur
                         return False
                     return True
         return False  # Si une des conditions plus haut n'est pas satisfaite, on renvoie "False"
@@ -419,13 +450,9 @@ class Grille:
         if not coordonnees_index:
             return False, None
 
-        case = self.cases[coordonnees_index[1]][coordonnees_index[0]]   # On accède la case visée, tout en faisant
-                                                                        # attention à mettre la coordonnée y en premier
+        case = self.cases[coordonnees_index[1]][coordonnees_index[0]]  # On accède la case visée, tout en faisant
+        # attention à mettre la coordonnée y en premier
         return case.recevoir_tir()
-
-
-
-
 
     # Méthodes obsolètes
     @staticmethod
@@ -459,23 +486,26 @@ class Grille:
         libres_verticales = []
         for l in range(len(self.cases)):
             for c in range(len(self.cases[l])):
-                if not self.__obsolete_element_dans_liste(self.cases[l][c], libres_horizontales):  # Si la case n'a pas déjà été
-                                                                                        # comptée horizontalement
+                if not self.__obsolete_element_dans_liste(self.cases[l][c],
+                                                          libres_horizontales):  # Si la case n'a pas déjà été
+                    # comptée horizontalement
                     groupe_horizontal = []
                     i = 0
-                    while (c+i < len(self.cases[l]) and          # Tant qu'on est dans les bornes et
-                          self.cases[l][c+i].bateau() is None):  # que la case est vide
-                        groupe_horizontal.append(self.cases[l][c+i])
+                    while (c + i < len(self.cases[l]) and  # Tant qu'on est dans les bornes et
+                           self.cases[l][c + i].bateau() is None):  # que la case est vide
+                        groupe_horizontal.append(self.cases[l][c + i])
                         i += 1
                     if groupe_horizontal:  # Si le groupe horizontal contient au moins une case
-                        libres_horizontales.append(groupe_horizontal)  # ajoute le groupe s'il contient au moins une case
-                if not self.__obsolete_element_dans_liste(self.cases[l][c], libres_verticales):    # Si la case n'a pas déjà été
-                                                                                        # comptée verticalement
+                        libres_horizontales.append(
+                            groupe_horizontal)  # ajoute le groupe s'il contient au moins une case
+                if not self.__obsolete_element_dans_liste(self.cases[l][c],
+                                                          libres_verticales):  # Si la case n'a pas déjà été
+                    # comptée verticalement
                     groupe_vertical = []
                     i = 0
-                    while (l+i < len(self.cases) and                # Tant qu'on est dans les bornes et
-                           self.cases[l+i][c].bateau() is None):    # que la case est vide
-                        groupe_vertical.append(self.cases[l+i][c])
+                    while (l + i < len(self.cases) and  # Tant qu'on est dans les bornes et
+                           self.cases[l + i][c].bateau() is None):  # que la case est vide
+                        groupe_vertical.append(self.cases[l + i][c])
                         i += 1
                     if groupe_vertical:  # Si le groupe vertical contient au moins une case
                         libres_verticales.append(groupe_vertical)  # ajoute le groupe s'il contient au moins une case
@@ -483,15 +513,18 @@ class Grille:
         # On enlève les cases qui sont comptées à double alors qu'elle ne devaient pas
         for groupe in libres_horizontales:
             if len(groupe) == 1:  # Si c'est une case isolée horizontalement
-                if self.__obsolete_element_dans_liste(groupe[0], libres_verticales):  # Si la case est déjà comptée verticalement
+                if self.__obsolete_element_dans_liste(groupe[0],
+                                                      libres_verticales):  # Si la case est déjà comptée verticalement
                     libres_horizontales.remove(groupe)
         for groupe in libres_verticales:
             if len(groupe) == 1:  # Si c'est une case isolée verticalement
-                if self.__obsolete_element_dans_liste(groupe[0], libres_horizontales):  # Si la case est déjà comptée horizontalement
+                if self.__obsolete_element_dans_liste(groupe[0],
+                                                      libres_horizontales):  # Si la case est déjà comptée horizontalement
                     libres_verticales.remove(groupe)
 
         cases_libres = libres_horizontales + libres_verticales
-        return sorted(cases_libres, key=lambda x: len(x))  # On renvoie les groupes de cases par ordre croissant de taille
+        return sorted(cases_libres,
+                      key=lambda x: len(x))  # On renvoie les groupes de cases par ordre croissant de taille
 
     def __obsolete_groupes_de_cases_libres(self, longueur):
         """
@@ -507,9 +540,9 @@ class Grille:
             if len(groupe) < longueur:
                 groupes.remove(groupe)  # On enlève tous les groupes qui sont trop petits
             elif len(groupe) > longueur:
-                for i in range(len(groupe)-longueur):
-                    groupes.append(groupe[i:longueur+i])    # Si un groupe est trop grand, on le divise en plusieurs
-                                                            # groupes possibles
+                for i in range(len(groupe) - longueur):
+                    groupes.append(groupe[i:longueur + i])  # Si un groupe est trop grand, on le divise en plusieurs
+                    # groupes possibles
                 groupes.remove(groupe)
         return groupes
 
@@ -521,9 +554,11 @@ class Grille:
         :return: réussite de l'opération
         """
         self.reinitialiser()
-        bateaux_a_placer = trier_bateaux_par_taille(self.bateaux, True)  # On trie les bateaux dans l'ordre décroissant pour
-                                                                         # placer les plus grands en premier
+        bateaux_a_placer = trier_bateaux_par_taille(self.bateaux,
+                                                    True)  # On trie les bateaux dans l'ordre décroissant pour
+        # placer les plus grands en premier
         for bateau in bateaux_a_placer:
             cases_possibles = self.__obsolete_groupes_de_cases_libres(bateau.TAILLE)
-            bateau.set_cases(random.choice(cases_possibles))  # Sélectionne un groupe de cases aléatoire pour les cases du bateau
+            bateau.set_cases(
+                random.choice(cases_possibles))  # Sélectionne un groupe de cases aléatoire pour les cases du bateau
         return True
