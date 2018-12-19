@@ -12,8 +12,8 @@ class AbstractBateau:
 
     Le mot "Abstract" dans son nom indique qu'elle n'est pas conçue pour être utilisée de manière directe.
     """
-    TAILLE = None   # l'attribut "largeur_pixels" est défini en dehors du constructeur,
-                    # car chaque bateau d'un même type a la même taille
+    TAILLE = None  # l'attribut "largeur_pixels" est défini en dehors du constructeur,
+    # car chaque bateau d'un même type a la même taille
     TYPE = None  # le type est lui aussi commun à tous les bateaux d'une même classe
     NOMBRE_RESTANT = None  # nombre de bateaux non coulés par type
 
@@ -55,8 +55,8 @@ class AbstractBateau:
             # Cette condition vérifie qu'il y a le bon nombre de cases, qu'elle sont alignées et
             # qu'il n'y a pas d'espace les séparant.
             for case in cases:
-                if case.bateau() is not None:   # vérifie qu'un autre bateau n'est pas déjà présent
-                                                # sur une des nouvelles cases
+                if case.bateau() is not None:  # vérifie qu'un autre bateau n'est pas déjà présent
+                    # sur une des nouvelles cases
                     return False  # renvoie "False" car un bateau est déjà présent
 
             for case in self._cases:
@@ -68,7 +68,7 @@ class AbstractBateau:
         else:
             return False  # renvoie "False", car l'opération a échoué
         # On regarde si l'état du bateau a changé
-        self.__class__.NOMBRE_RESTANT += etait_coule-self.est_coule()
+        self.__class__.NOMBRE_RESTANT += etait_coule - self.est_coule()
         # Pour plus d'informations regarder méthode "recevoir_tir"
         return True  # renvoie "True", car les cases ont bien été remplacées
 
@@ -99,12 +99,12 @@ class AbstractBateau:
                 if self.est_coule():
                     self.NOMBRE_RESTANT -= 1
                     cases_modifiees = self._cases
-                    for chaque_case in self._cases:     # On utilise le nom "chaque_case", car "case" est déjà
-                                                        # le nom d'un paramètre
+                    for chaque_case in self._cases:  # On utilise le nom "chaque_case", car "case" est déjà
+                        # le nom d'un paramètre
                         chaque_case.etat = Etat.COULE  # si le bateau est coulé, on change l'état de chaque case
 
                         # On regarde si l'état du bateau a changé
-                        self.__class__.NOMBRE_RESTANT += etait_coule-self.est_coule()
+                        self.__class__.NOMBRE_RESTANT += etait_coule - self.est_coule()
                         # Note : on a le droit de soustraire des booléens, "True" vaut 1 et "False" 0
                         # Donc si le bateau n'était pas coulé (0) et que maintenant il l'est (1), on a 0-1 = -1,
                         # donc on ajoute -1 (on enlève 1) au nombre de bateaux restants
@@ -118,8 +118,8 @@ class Torpilleur(AbstractBateau):
     Classe héritant de "AbstractBateau" permettant de créer des torpilleurs.
     """
     TAILLE = 2  # la taille et le type sont redéfinis pour chaque classe héritant de "AbstractBateau"
-    TYPE = "torpilleur"     # sert à afficher le type du bateau indépendamment du nom de la classe
-                            # (contrairement à __class__.__name__.lower())
+    TYPE = "torpilleur"  # sert à afficher le type du bateau indépendamment du nom de la classe
+    # (contrairement à __class__.__name__.lower())
     NOMBRE_RESTANT = 0
 
     def __init__(self, cases=None):

@@ -83,8 +83,8 @@ class Tortue(turtle.Turtle):
         """
         turtle.Turtle.__init__(self)
         self.hideturtle()  # cache la tortue
-        self.screen.tracer(0, 0)    # rend le dessin instantané, mais l'écran doit être rafraîchit manuellement
-                                    # en appelant "self.screen.update()"
+        self.screen.tracer(0, 0)  # rend le dessin instantané, mais l'écran doit être rafraîchit manuellement
+        # en appelant "self.screen.update()"
 
     @staticmethod
     def couleur_case(etat):
@@ -572,7 +572,8 @@ class Afficheur:
         print(message, end=fin)
         if self.grille_visible:
             position = (self.grille.position_coins()[1][0] + self.grille.largeur_pixels() / 2.0,
-                        self.grille.position_coins()[1][1] - 25 - numero_ligne * 20)  # On place en bas au milieu de la grille
+                        self.grille.position_coins()[1][
+                            1] - 25 - numero_ligne * 20)  # On place en bas au milieu de la grille
         else:
             position = (0, self.grille.position_coins()[1][1] - 25 - numero_ligne * 20)
         _tortue.ecrire(message, position, alignement="center", fonte=("Arial", self.TAILLE_POLICE_DEFAUT, "bold"))
@@ -594,7 +595,8 @@ class Afficheur:
         :return: "None"
         """
         self.tortue_elements_permanents.clear()
-        self.ecrire_texte(valeurs_possibles, (0, 0), alignement="center", fonte=("Arial", self.TAILLE_POLICE_DEFAUT, "normal"))
+        self.ecrire_texte(valeurs_possibles, (0, 0), alignement="center",
+                          fonte=("Arial", self.TAILLE_POLICE_DEFAUT, "normal"))
         return chaine_nettoyee(self.recevoir_entree(">>> "))
 
     def afficher_parametres(self, partie_en_cours=False):
@@ -666,7 +668,8 @@ class Afficheur:
                                     self.chaine_nouvelle_difficulte()))
                         elif entree == 2:  # "Nombre maximum de coups"
                             minimum = self.grille.nombre_de_cases_occupees()
-                            texte = ["Nouvelle valeur (auto, {0}, {1}, {2}, ...) : ".format(minimum, minimum + 1, minimum + 2)]
+                            texte = ["Nouvelle valeur (auto, {0}, {1}, {2}, ...) : ".format(minimum, minimum + 1,
+                                                                                            minimum + 2)]
                             nouvelle_valeur = self.changer_parametre(texte)
                             if nouvelle_valeur in ("", "<"):
                                 self.afficher_parametres(partie_en_cours=partie_en_cours)
@@ -675,7 +678,8 @@ class Afficheur:
                                 self._nouveau_parametre_nombre_de_coups_maximum = "auto"
                                 self.afficher(
                                     ("Nombre de coups maximum changé à {0}, "
-                                     "les modifications prendront effet à la prochaine partie.").format(nouvelle_valeur))
+                                     "les modifications prendront effet à la prochaine partie.").format(
+                                        nouvelle_valeur))
                             else:
                                 try:
                                     nouvelle_valeur = int(float(nouvelle_valeur))
@@ -689,14 +693,16 @@ class Afficheur:
                                     self._nouveau_parametre_nombre_de_coups_maximum = nouvelle_valeur
                                     self.afficher(
                                         ("Nombre de coups maximum changé à {0}, "
-                                         "les modifications prendront effet à la prochaine partie.").format(nouvelle_valeur))
+                                         "les modifications prendront effet à la prochaine partie.").format(
+                                            nouvelle_valeur))
                                 else:
                                     self.afficher_erreur("Nombre de coups insuffisant.")
                                     recommencer2 = True
                                     continue
                         elif entree == 3:  # "Temps maximum"
                             minimum = 1
-                            texte = ["Nouvelle valeur (auto, {0}, {1}, {2}, ...) : ".format(minimum, minimum + 1, minimum + 2)]
+                            texte = ["Nouvelle valeur (auto, {0}, {1}, {2}, ...) : ".format(minimum, minimum + 1,
+                                                                                            minimum + 2)]
                             nouvelle_valeur = self.changer_parametre(texte)
                             if nouvelle_valeur in ("", "<"):
                                 self.afficher_parametres(partie_en_cours=partie_en_cours)
@@ -705,7 +711,8 @@ class Afficheur:
                                 self._nouveau_parametre_temps_maximum = "auto"
                                 self.afficher(
                                     ("Temps réglé de manière automatique ({0} s), "
-                                    "les modifications prendront effet à la prochaine partie.").format(self.temps_maximum()))
+                                     "les modifications prendront effet à la prochaine partie.").format(
+                                        self.temps_maximum()))
                             else:
                                 try:
                                     nouvelle_valeur = int(float(nouvelle_valeur))
@@ -717,7 +724,8 @@ class Afficheur:
                                     self._nouveau_parametre_temps_maximum = nouvelle_valeur
                                     self.afficher(
                                         ("Temps maximum changé à {0}, "
-                                        "les modifications prendront effet à la prochaine partie.").format(nouvelle_valeur))
+                                         "les modifications prendront effet à la prochaine partie.").format(
+                                            nouvelle_valeur))
                                 else:
                                     self.afficher_erreur("Temps insuffisant.")
                                     recommencer2 = True
@@ -738,7 +746,7 @@ class Afficheur:
                                 self._nouvelle_taille_grille = cote
                                 self.afficher(
                                     ("Taille de la grille changée à {0}, "
-                                    "les modifications prendront effet à la prochaine partie.").format(cote))
+                                     "les modifications prendront effet à la prochaine partie.").format(cote))
                             elif nouvelle_valeur < 6:
                                 self.afficher_erreur(
                                     "La grille doit avoir une taille minimum de 6 cases pour pouvoir placer des bateaux")
@@ -1073,7 +1081,8 @@ class Afficheur:
                 self.afficher("Touché")
             else:
                 type_bateau = cases_affectees[0].bateau().TYPE  # On récupère le type du bateau touché
-                type_bateau = type_bateau[0].upper() + type_bateau[1:len(type_bateau)]  # On met la première lettre en majuscules
+                type_bateau = type_bateau[0].upper() + type_bateau[
+                                                       1:len(type_bateau)]  # On met la première lettre en majuscules
                 self.afficher(type_bateau + " coulé")
             self.nombre_de_coups += 1
         else:
