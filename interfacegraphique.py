@@ -277,7 +277,7 @@ class Tortue(turtle.Turtle):
         for i, bateau in enumerate(grille.bateaux):
             self.aller_a(position[0] - 15, position[1] + i*94 - 20)
             self.down()
-            self.write(str(grille.nombrebateauxdeboutpartype(bateau.TYPE)) + " × ", align="center", font=("Arial", 12, "bold"))
+            self.write(str(grille.nombrebateauxdeboutpartype(bateau.TYPE)) + " × ", align="center", font=("Arial", 14, "bold"))
         self.screen.update()
 
 
