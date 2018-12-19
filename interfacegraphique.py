@@ -131,6 +131,10 @@ class Tortue(turtle.Turtle):
         self.pencolor(ancienne_couleur)  # Rétablit la couleur de la tortue
         
     def dessinfond(self):
+        """
+        Donne une couleur à l'arrière-plan
+        :return: "None"
+        """
         self.fillcolor(self.COULEUR_FOND)
         self.setheading(0)
         self.begin_fill()
@@ -143,15 +147,21 @@ class Tortue(turtle.Turtle):
     
     @staticmethod
     def longueur_bateau(taille):
+        """
+        Définit la longueur graphique du bateau
+        :param taille: nombre de case du bateau
+        :return: taille graphique
+        """
         return 30*taille
 
     def dessincale(self, bateau):
         """
+        Dessine la cale du bateau selon ce schéma:
                  _______________
         alpha -> \             / <- beta
                   \___________/
         :param bateau: bateau dont il faut dessiner la cale
-        :return: pas de retour
+        :return: "None"
         """
         alpha = 85
         beta = 60
@@ -174,7 +184,7 @@ class Tortue(turtle.Turtle):
         
     def dessintourelle(self, orientation):
         """
-        Dessine une tourelle.
+        Dessine une tourelle
          __
         /__\====
         
@@ -207,7 +217,11 @@ class Tortue(turtle.Turtle):
         self.end_fill()
         self.up()
               
-    def dessincheminee(self, bateau):
+    def dessincheminee(self):
+        """
+        Dessine une cheminée pour les bateaux
+        :return: "None"
+        """
         origine = self.pos()
         self.setheading(90)
         self.down()
@@ -268,7 +282,7 @@ class Tortue(turtle.Turtle):
                             + (nombre_cheminees-1)*self.ESPACEMENT_CHEMINEE)/2.0
                         - self.LARGEUR_CHEMINEE)
             for i in range(nombre_cheminees):  # On dessine deux cheminées
-                self.dessincheminee(bateau)
+                self.dessincheminee()
                 if i < nombre_cheminees-1:
                     self.forward(self.ESPACEMENT_CHEMINEE)
             self.screen.update()
@@ -358,6 +372,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
         self.tortue_elements_permanents = Tortue()  # Tortue dessinant les éléments restants plusieurs tours d'affilée
         self.tortue_elements_provisoires = Tortue()  # Tortue dessinant les éléments changés à chaque tour
         self.tortue_questions = Tortue()  # Tortue affichant les questions
+        self.tortue_erreurs = Tortue()  # tortue affichant les erreurs
         self.nombre_de_coups = 0
         self.temps_depart = 0
         self.grille_visible = False
@@ -472,6 +487,19 @@ class Afficheur:  # TODO: titre, barrer cases coulées
         self.tortue_elements_provisoires.clear()
         self.tortue_elements_permanents.clear()
         self.tortue_questions.clear()
+        self.tortue_erreurs.clear()
+
+    def ecrire_texte(self, lignes, position, alignement="left", police=("Arial", 12, "normal"), couleur="black", tortue=None):
+        _tortue = tortue
+        if tortue is None:
+            _tortue = self.tortue_elements_permanents
+        x, y = 0, 0
+        if position is not None:
+            x = position[0]
+            y = position[1]
+        for i, ligne in enumerate(lignes):
+            print(ligne)
+            _tortue.ecrire(ligne, (x, y - i * 20), alignement=alignement, police=police, couleur=couleur)
 
     def afficher(self, message, fin="\n", niveau=0, tortue=None):
         """
@@ -495,6 +523,11 @@ class Afficheur:  # TODO: titre, barrer cases coulées
     def afficher_titre(self):
         self.tortue_elements_permanents.ecrire("Bataille navale", (0, 200), "center", ("Arial", 24, "underline"))
 
+    def changer_parametre(self, texte):
+        self.tortue_elements_permanents.clear()
+        self.ecrire_texte(texte, (0, 0), alignement="center", police=("Arial", self.TAILLE_POLICE_DEFAUT, "normal"))
+        return chaine_nettoyee(self.recevoir_entree(">>> "))
+
     def afficher_parametres(self, partie_en_cours=False):
         sous_titre = "Paramètres"
         texte = ["1. Difficulté : {0}".format(self.chaine_nouvelle_difficulte()),
@@ -512,9 +545,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
             x, y = 0, 40
             print("\n" + sous_titre)
             self.tortue_elements_permanents.ecrire(sous_titre, (0, y), alignement="center", police=("Arial", self.TAILLE_POLICE_DEFAUT, "bold"))
-            for i, ligne in enumerate(texte):
-                print(ligne)
-                self.tortue_elements_permanents.ecrire(ligne, (0, y - 40 - i * 20), alignement="center", police=("Arial", self.TAILLE_POLICE_DEFAUT, "normal"))
+            self.ecrire_texte(texte, (0, 0), alignement="center", police=("Arial", self.TAILLE_POLICE_DEFAUT, "normal"))
             entree = chaine_nettoyee(self.recevoir_entree(">>> "))
             if entree in ("", "<"):
                 self.afficher_menu(partie_en_cours=partie_en_cours)
@@ -523,7 +554,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
                 try:
                     entree = int(float(entree))
                 except ValueError:
-                    self.afficher_erreur()
+                    self.afficher_erreur("Entrée invalide.")
                     recommencer = True
                     continue
 
@@ -532,12 +563,15 @@ class Afficheur:  # TODO: titre, barrer cases coulées
                     while recommencer2:
                         recommencer2 = False
                         if entree == 1:  # "Difficulté"
-                            nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("Nouvelle valeur (1. facile, 2. moyen, 3. difficile) : "))
+                            texte = ["1. facile",
+                                     "2. moyen",
+                                     "3. difficile"]
+                            nouvelle_valeur = self.changer_parametre(texte)
                             if nouvelle_valeur in ("", "<"):
                                     self.afficher_parametres(partie_en_cours=partie_en_cours)
                                     return
                             elif nouvelle_valeur in ("a", "auto"):
-                                self.afficher("La difficulté ne peut pas être automatique")
+                                self.afficher_erreur("La difficulté ne peut pas être automatique.")
                                 recommencer2 = True
                                 continue
                             elif nouvelle_valeur in ("1", "1.", "f", "facile"):
@@ -547,13 +581,14 @@ class Afficheur:  # TODO: titre, barrer cases coulées
                             elif nouvelle_valeur in ("3", "3.", "d", "difficile"):
                                 self._nouvelle_difficulte = Difficulte.DIFFICILE
                             else:
-                                self.afficher_erreur()
+                                self.afficher_erreur("Entrée invalide.")
                                 recommencer2 = True
                                 continue
                             self.afficher("Difficulté changée à {0}, les modifications prendront effet à la prochaine partie.".format(self.chaine_nouvelle_difficulte()))
                         elif entree == 2:  # "Nombre maximum de coups"
                             min = self.grille.nombre_de_cases_occupees()
-                            nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("Nouvelle valeur (auto, {0}, {1}, {2}, ...) : ".format(min, min+1, min+2)))
+                            texte = ["Nouvelle valeur (auto, {0}, {1}, {2}, ...) : ".format(min, min+1, min+2)]
+                            nouvelle_valeur = self.changer_parametre(texte)
                             if nouvelle_valeur in ("", "<"):
                                 self.afficher_parametres(partie_en_cours=partie_en_cours)
                                 return
@@ -564,7 +599,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
                                 try:
                                     nouvelle_valeur = int(float(nouvelle_valeur))
                                 except ValueError:
-                                    self.afficher_erreur()
+                                    self.afficher_erreur("Entrée invalide.")
                                     recommencer2 = True
                                     continue
                                 if nouvelle_valeur >= self.grille.nombre_de_cases_occupees():  # On veut que le nombre
@@ -573,12 +608,13 @@ class Afficheur:  # TODO: titre, barrer cases coulées
                                     self._nouveau_parametre_nombre_de_coups_maximum = nouvelle_valeur
                                     self.afficher("Nombre de coups maximum changé à {0}, les modifications prendront effet à la prochaine partie.".format(nouvelle_valeur))
                                 else:
-                                    self.afficher("Nombre de coups insuffisant.")
+                                    self.afficher_erreur("Nombre de coups insuffisant.")
                                     recommencer2 = True
                                     continue
                         elif entree == 3:  # "Temps maximum"
                             min = 1
-                            nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("Nouvelle valeur (auto, {0}, {1}, {2}, ...) : ".format(min, min+1, min+2)))
+                            texte = ["Nouvelle valeur (auto, {0}, {1}, {2}, ...) : ".format(min, min+1, min+2)]
+                            nouvelle_valeur = self.changer_parametre(texte)
                             if nouvelle_valeur in ("", "<"):
                                 self.afficher_parametres(partie_en_cours=partie_en_cours)
                                 return
@@ -589,35 +625,36 @@ class Afficheur:  # TODO: titre, barrer cases coulées
                                 try:
                                     nouvelle_valeur = int(float(nouvelle_valeur))
                                 except ValueError:
-                                    self.afficher_erreur()
+                                    self.afficher_erreur("Entrée invalide.")
                                     recommencer2 = True
                                     continue
                                 if nouvelle_valeur > 0:
                                     self._nouveau_parametre_temps_maximum = nouvelle_valeur
                                     self.afficher("Temps maximum changé à {0}, les modifications prendront effet à la prochaine partie.".format(nouvelle_valeur))
                                 else:
-                                    self.afficher("Temps insuffisant.")
+                                    self.afficher_erreur("Temps insuffisant.")
                                     recommencer2 = True
                                     continue
                         else:  # "Taille grille"
-                            nouvelle_valeur = chaine_nettoyee(self.recevoir_entree("\nAvec quelle taille de grille souhaitez-vous jouer? (nombre entre 6 et 26)\n"))
+                            texte = ["\nAvec quelle taille de grille souhaitez-vous jouer? (nombre entre 6 et 26)\n"]
+                            nouvelle_valeur = self.changer_parametre(texte)
                             if nouvelle_valeur in ("", "<"):
                                 self.afficher_parametres(partie_en_cours=partie_en_cours)
                                 return
                             try:  # On teste si la ligne suivante provoque une erreur
                                 nouvelle_valeur = int(float(nouvelle_valeur))  # Le "float" permet d'accepter des valeurs comme 5.0 ou 2.3e1 (23)
                             except ValueError:  # Si une erreur de valeur est signalée
-                                self.afficher("Erreur, vous devez entrer un nombre")
+                                self.afficher_erreur("Erreur, vous devez entrer un nombre")
                             if nouvelle_valeur >= 6 and nouvelle_valeur <= 26:
                                 cote = nouvelle_valeur
                                 self._nouvelle_taille_grille = cote
                                 self.afficher("Taille de la grille changée à {0}, les modifications prendront effet à la prochaine partie.".format(cote))
                             elif nouvelle_valeur < 6:
-                                self.afficher("La grille doit avoir une taille minimum de 6 cases pour pouvoir placer des bateaux")
+                                self.afficher_erreur("La grille doit avoir une taille minimum de 6 cases pour pouvoir placer des bateaux")
                                 recommencer2 = True
                                 continue
                             else:
-                                self.afficher("La grille est trop grande, le maximum est 26")
+                                self.afficher_erreur("La grille est trop grande, le maximum est 26")
                                 recommencer2 = True  # TODO: régler problèmes affichage méthode afficher
                                 continue
                 else:
@@ -670,7 +707,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
                 try:
                     entree = int(entree)  # On convertit l'entrée en nombres, si ça ne marche pas, on affiche une erreur
                 except ValueError:
-                    self.afficher_erreur()  # On affiche une erreur et on recommence
+                    self.afficher_erreur("Entrée invalide.")  # On affiche une erreur et on recommence
                     recommencer = True
                     continue
 
@@ -695,7 +732,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
                         recommencer = True
                         continue
                 else:  # Erreur
-                    self.afficher_erreur()
+                    self.afficher_erreur("Entrée invalide.")
                     recommencer = True
                     continue
 
@@ -713,13 +750,14 @@ class Afficheur:  # TODO: titre, barrer cases coulées
         print(texte)
         self.tortue_elements_provisoires.ecrire(texte, (-330, 275), "left", ("Arial", self.TAILLE_POLICE_DEFAUT, "normal"))
 
-    def afficher_erreur(self):
+    def afficher_erreur(self, message="Une erreur s'est produite."):
         """
         Indique à l'utilisateur qu'une erreur s'est produite.
 
         :return: "None"
         """
-        self.afficher("Une erreur s'est produite.")
+        self.tortue_erreurs.clear()
+        self.afficher(message, tortue=self.tortue_erreurs)
 
     @staticmethod
     def recevoir_entree(texte_a_afficher=""):
@@ -767,7 +805,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
             elif entree.lower() in ("n", "non"):
                 return False
             else:
-                self.afficher("Erreur, entrée invalide.")
+                self.afficher_erreur("Entrée invalide.")
 
     def rejouer(self):
         """
@@ -793,6 +831,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
         """
         self.tortue_elements_provisoires.clear()
         self.tortue_questions.clear()
+        self.tortue_erreurs.clear()
         self.tortue_questions.screen.update()
         if retour_tir != "aucun retour":
             self.afficher_retour_tir(retour_tir, cases)
@@ -803,7 +842,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
         self.tortue_elements_permanents.screen.update()
         self.afficher_coups_restants()
         self.afficher_temps_restant()
-        self.tortue_elements_provisoires.dessintextenombrebateaux(self.grille, (-300, -185))
+        self.tortue_elements_provisoires.dessintextenombrebateaux(self.grille, (-300, -175))
 
     def dessiner_tout(self):
         """
@@ -816,7 +855,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
         self.effacer_tout()
         self.tortue_elements_permanents.dessinfond()
         self.tortue_elements_permanents.dessiner_grille(self.grille.cases)
-        self.tortue_elements_permanents.dessinbateaux(self.grille, (-300, -185))
+        self.tortue_elements_permanents.dessinbateaux(self.grille, (-300, -175))
         self.actualiser()
 
     def ajouter_espacement_avant(self, nombre=None):
@@ -929,7 +968,7 @@ class Afficheur:  # TODO: titre, barrer cases coulées
                 self.afficher(type + " coulé")
             self.nombre_de_coups += 1
         else:
-            self.afficher_erreur()
+            self.afficher_erreur("Case entrée invalide")
 
     def avancer_d_un_tour(self, entree):
         """
