@@ -1138,6 +1138,4 @@ class Afficheur:
         """
         while True:
             entree = self.recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
-            # entree = string.ascii_uppercase[random.randint(0, self.grille.taille()-1)] + str(random.randint(1, self.grille.taille()))
-            # TODO: enlever ligne de test
             self.avancer_d_un_tour(entree)
