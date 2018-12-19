@@ -52,7 +52,7 @@ class Case:
     La position de chaque case est la position de son coin inférieur gauche.
     """
     largeur_pixels = 40  # taille en pixels, le nom est en majuscules par convention, car c'est une constante
-    CARACTERES_ETAT = ["_", "*", "o", "x", "#"]  # TODO: remettre "_" (tiret en bas) à la place de "*"
+    CARACTERES_ETAT = ["_", "_", "o", "x", "#"]
 
     def __init__(self, position, etat=Etat.VIDE, bateau=None):
         """
@@ -454,6 +454,7 @@ class Grille:
         # attention à mettre la coordonnée y en premier
         return case.recevoir_tir()
 
+    # TODO: enlever méthodes obsolètes
     # Méthodes obsolètes
     @staticmethod
     def __obsolete_element_dans_liste(element, liste):
