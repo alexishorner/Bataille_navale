@@ -966,7 +966,17 @@ class Afficheur:  # TODO: titre, barrer cases coulées
                         return
                     exit(0)
             elif self.joueur_a_perdu():
-                print("Vous avez perdu!")
+                self.afficher("Vous avez perdu!", niveau=1)
+                self.afficher("Tapez \"m\", \"menu\" ou la touche entrée pour accéder au menu.", niveau=3)
+                choix = chaine_nettoyee(self.recevoir_entree("\n>>> "))
+                if choix in ("m", "menu", ""):
+                    self.afficher_menu()
+                    return
+                else:
+                    if self.demander_rejouer():
+                        self.rejouer()
+                        return
+                    exit(0)
                 if self.demander_rejouer():
                     self.rejouer()
 
