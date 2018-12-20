@@ -31,7 +31,7 @@ def creer_bateaux():
     """
     Crée une liste contenant le nombre désiré de chaque type de bateau.
 
-    :return: "None"
+    :return: pas de retour
     """
     bateaux = []
     bateaux.extend(creer_bateau(bateau.Torpilleur, NOMBRE_TORPILLEURS))

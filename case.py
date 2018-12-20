@@ -165,7 +165,7 @@ class Case:
         Mutateur de l'attribut "_bateau". Il sert à changer de bateau de manière sécurisée.
 
         :param bateau: nouveau bateau
-        :return: "None"
+        :return: pas de retour
         """
         if bateau is None:
             self.etat = Etat.VIDE
@@ -212,7 +212,7 @@ class Grille:
         Crée les cases de la grille en ajustant leur taille pour avoir une largeur de grille approximativement fixe,
         tout en ayant un nombre entier pour la largeur de chaque case.
 
-        :return: "None"
+        :return: pas de retour
         """
         self.cases = []
         Case.largeur_pixels = round(
@@ -307,7 +307,7 @@ class Grille:
         """
         Enlève tous les bateaux de la grille.
 
-        :return: "None"
+        :return: pas de retour
         """
         for ligne in self.cases:
             for case in ligne:
@@ -318,7 +318,7 @@ class Grille:
         """
         Remet toutes les cases à leur état initial.
 
-        :return: "None"
+        :return: pas de retour
         """
         self.enlever_bateaux()  # Enlève tous les bateaux
         for ligne in self.cases:

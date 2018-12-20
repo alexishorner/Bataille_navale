@@ -109,7 +109,7 @@ class Tortue(turtle.Turtle):
 
         :param x: entier représentant la coordonnée x ou liste contenant les deux coordonnées.
         :param y: entier représentant la coordonnée y
-        :return: "None"
+        :return: pas de retour
         """
         etait_en_bas = self.isdown()
         self.up()
@@ -129,7 +129,7 @@ class Tortue(turtle.Turtle):
         :param alignement: alignement du texte
         :param fonte: fonte à utiliser
         :param couleur: couleur du texte
-        :return: "None"
+        :return: pas de retour
         """
         ancienne_couleur = self.pencolor()  # Enregistre la couleur de la tortue
         self.pencolor(couleur)
@@ -140,7 +140,7 @@ class Tortue(turtle.Turtle):
     def dessinfond(self):
         """
         Donne une couleur à l'arrière-plan
-        :return: "None"
+        :return: pas de retour
         """
         self.fillcolor(self.COULEUR_FOND)
         self.setheading(0)
@@ -168,7 +168,7 @@ class Tortue(turtle.Turtle):
         alpha -> \             / <- beta
                   \___________/
         :param bateau: bateau dont il faut dessiner la cale
-        :return: "None"
+        :return: pas de retour
         """
         alpha = 85
         beta = 60
@@ -197,7 +197,7 @@ class Tortue(turtle.Turtle):
         /__\====
         
         :param orientation: défini l'orientation de la tourelle. 1 veut dire droite et -1 gauche
-        :return: "None"
+        :return: pas de retour
         """
         alpha = 70
         beta = 80
@@ -231,7 +231,7 @@ class Tortue(turtle.Turtle):
     def dessincheminee(self):
         """
         Dessine une cheminée pour les bateaux
-        :return: "None"
+        :return: pas de retour
         """
         origine = self.pos()
         self.setheading(90)
@@ -322,7 +322,7 @@ class Tortue(turtle.Turtle):
 
         :param origine: origine de la case supérieure gauche de la grille.
         :param cote_grille: nombre de cases composant le côté de la grille
-        :return: "None"
+        :return: pas de retour
         """
         x_0, y_0 = origine
         decimales_max = decimales(cote_grille)  # Nombre de caractères pour écrire le nombre
@@ -341,7 +341,7 @@ class Tortue(turtle.Turtle):
         Dessine une case à l'écran.
 
         :param case: case à dessiner
-        :return: "None"
+        :return: pas de retour
         """
         self.down()
         self.pensize(1)
@@ -359,7 +359,7 @@ class Tortue(turtle.Turtle):
         Dessine la grille.
 
         :param cases: grille à dessiner
-        :return: "None"
+        :return: pas de retour
         """
         self.dessiner_graduations(cases[0][0].position, len(cases))
         for ligne in cases:
@@ -525,7 +525,7 @@ class Afficheur:
         """
         Efface tout ce qui est affiché à l'écran avec la tortue.
 
-        :return: "None"
+        :return: pas de retour
         """
         self.tortue_elements_provisoires.clear()
         self.tortue_elements_permanents.clear()
@@ -543,7 +543,7 @@ class Afficheur:
         :param fonte: Fonte à utiliser pour écrire, c'est un tuple contenant la police, la taille et le style.
         :param couleur: Couleur du texte.
         :param tortue: Tortue avec laquelle effectuer l'affichage
-        :return: "None"
+        :return: pas de retour
         """
         _tortue = tortue
         if tortue is None:
@@ -564,7 +564,7 @@ class Afficheur:
         :param numero_ligne: Entier permettant de simuler les retours à la ligne avec la tortue.
         :param message: message à afficher
         :param fin: caractère à placer dans la console après le message
-        :return: "None"
+        :return: pas de retour
         """
         _tortue = tortue
         if tortue is None:
@@ -583,7 +583,7 @@ class Afficheur:
         """
         Affiche le titre dans la console.
 
-        :return: "None"
+        :return: pas de retour
         """
         self.tortue_elements_permanents.ecrire("Bataille navale", (0, 200), "center", ("Arial", 24, "underline"))
 
@@ -592,7 +592,7 @@ class Afficheur:
         Efface la page des paramètres et affiche les valeurs possibles pour changer le paramètre sélectionné.
 
         :param valeurs_possibles: Liste contenant des chaînes de caractères à afficher pour changer la valeur du paramètre.
-        :return: "None"
+        :return: pas de retour
         """
         self.tortue_elements_permanents.clear()
         self.ecrire_texte(valeurs_possibles, (0, 0), alignement="center",
@@ -604,7 +604,7 @@ class Afficheur:
         Affiche les paramètres et permet à l'utilisateur de changer leur valeur.
 
         :param partie_en_cours: Booléen indiquant si la partie est en cours, cela a une importance pour afficher le menu.
-        :return: "None"
+        :return: pas de retour
         """
         sous_titre = "Paramètres"
         texte = ["1. Difficulté : {0}".format(self.chaine_nouvelle_difficulte()),
@@ -767,7 +767,7 @@ class Afficheur:
         Change la valeur des paramètres par la valeur des nouveaux paramètres choisis,
         cette fonction est appelée au début d'une partie.
 
-        :return: "None"
+        :return: pas de retour
         """
         self.difficulte = self._nouvelle_difficulte
         self._parametre_nombre_de_coups_maximum = self._nouveau_parametre_nombre_de_coups_maximum
@@ -778,7 +778,7 @@ class Afficheur:
         """
         Affiche le menu.
 
-        :return: "None"
+        :return: pas de retour
         """
         self.grille_visible = False
         sous_titre = "       Menu       "
@@ -847,7 +847,7 @@ class Afficheur:
         """
         Affiche le nombre de coups restants pour l'utilisateur.
 
-        :return: "None"
+        :return: pas de retour
         """
         self.tortue_elements_provisoires.ecrire("Coups restants : " + str(self.coups_restants()), (-330, 295), "left",
                                                 ("Arial", self.TAILLE_POLICE_DEFAUT, "normal"))
@@ -856,7 +856,7 @@ class Afficheur:
         """
         Affiche le temps restant avant la fin de la partie.
 
-        :return: "None"
+        :return: pas de retour
         """
         texte = "Temps restant : {0} s".format(int(round(self.temps_restant())))
         print(texte)
@@ -867,7 +867,7 @@ class Afficheur:
         """
         Indique à l'utilisateur qu'une erreur s'est produite.
 
-        :return: "None"
+        :return: pas de retour
         """
         self.tortue_erreurs.clear()
         self.afficher(message, tortue=self.tortue_erreurs)
@@ -924,7 +924,7 @@ class Afficheur:
         """
         Démarre une nouvelle partie
 
-        :return: "None"
+        :return: pas de retour
         """
         self.actualiser_parametres()
         self.nombre_de_coups = 0
@@ -942,7 +942,7 @@ class Afficheur:
 
         :param retour_tir: retour du dernier tir
         :param cases: liste de cases à actualiser
-        :return: "None"
+        :return: pas de retour
         """
         self.tortue_elements_provisoires.clear()
         self.tortue_questions.clear()
@@ -964,7 +964,7 @@ class Afficheur:
         Dessine la grille en entier avec la tortue et dans la console et affiche différentes informations.
 
         C'est ici que les éléments à l'écran ne changeant pas, comme le fond d'écran, sont dessinés.
-        :return: "None"
+        :return: pas de retour
         """
         self.grille_visible = True
         self.effacer_tout()
@@ -978,7 +978,7 @@ class Afficheur:
         Ajoute un espacement avant la grille pour aligner les nombres sur la droite.
 
         :param nombre: nombre qui doit être aligné
-        :return: "None"
+        :return: pas de retour
         """
         espacement_total = decimales(self.grille.taille())
         if nombre is None:
@@ -992,7 +992,7 @@ class Afficheur:
         Dessine la ligne de numérotation des colonnes de la grille.
 
         Exemple: _A_B_C_D_E_F_G_H_I_J_
-        :return: "None"
+        :return: pas de retour
         """
         self.ajouter_espacement_avant()
         for index_x in range(self.grille.taille()):
@@ -1005,7 +1005,7 @@ class Afficheur:
 
         :param index_y: index de la ligne
         :param index_x: index de la colonne
-        :return: "None"
+        :return: pas de retour
         """
         case = self.grille.cases[index_y][index_x]
         print("|", end="")
@@ -1029,7 +1029,7 @@ class Afficheur:
              8|_|_|_|_|_|_|_|_|_|_|
              9|_|_|_|_|_|_|_|_|_|_|
             10|_|_|_|_|_|_|_|_|_|_|
-        :return: "None"
+        :return: pas de retour
         """
         for index_y in range(self.grille.taille()):
             for index_x in range(self.grille.taille()):
@@ -1047,7 +1047,7 @@ class Afficheur:
         """
         Fonction multi-plateforme permettant d'effacer le contenu de la console.
 
-        :return: "None"
+        :return: pas de retour
         """
         if platform == "win32":  # La commande dépend du système d'exploitation
             _ = os.system("cls")  # Le "_" avant le signe "=" sert à récupérer le retour de la fonction pour empêcher
@@ -1070,7 +1070,7 @@ class Afficheur:
 
         :param retour: retour de la fonction de tir
         :param cases_affectees: cases modifiées par le tir (incl. cases coulées par tir sur autre case)
-        :return: "None"
+        :return: pas de retour
         """
         if retour is None:
             self.afficher("\nVous avez déjà tiré sur cette case.")
@@ -1143,7 +1143,7 @@ class Afficheur:
         Démarre la boucle des évènements.
 
         Demande à l'utlisateur où il veut tirer et tire sur la case.
-        :return: "None"
+        :return: pas de retour
         """
         while True:
             entree = self.recevoir_entree("\n>>> ")  # Équivalent à "raw_input("\n>>> ")", mais compatible avec python 3
